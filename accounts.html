@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header { padding: 48px 0 32px; border-bottom: 1px solid var(--af-sand-200); background: var(--af-white); }
+    .af-page-header h1 { font-family: var(--af-font-display); font-size: 32px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-page-header p { font-size: 16px; color: var(--af-slate-500); margin-top: 6px; }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
+
+    .af-account-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .af-account-row {
+      background: var(--af-white);
+      border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all var(--af-transition);
+    }
+    .af-account-row:hover { border-color: var(--af-green-200); box-shadow: var(--af-shadow-sm); }
+
+    .af-account-left { display: flex; align-items: center; gap: 16px; }
+    .af-account-icon {
+      width: 44px; height: 44px; border-radius: var(--af-radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .af-account-icon.current { background: var(--af-green-100); }
+    .af-account-icon.savings { background: var(--af-green-50); }
+    .af-account-icon.credit { background: #fef3e2; }
+    .af-account-icon.isa { background: #e8f0fe; }
+
+    .af-account-name { font-weight: 600; color: var(--af-slate-800); font-size: 15px; }
+    .af-account-detail { font-size: 13px; color: var(--af-slate-400); margin-top: 2px; }
+
+    .af-account-right { text-align: right; }
+    .af-account-balance {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em;
+    }
+    .af-account-meta { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; }
+
+    @media (max-width: 600px) {
+      .af-account-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .af-account-right { text-align: left; }
+    }
+  </style>
+</head>
+<body data-page="accounts">
+  <div id="header-placeholder"></div>
+  <main>
+    <div class="af-page-header">
+      <div class="af-inner"><h1>Accounts</h1><p>All your connected bank accounts and cards.</p></div>
+    </div>
+    <div class="af-page-body">
+      <div class="af-inner">
+        <div class="af-account-list">
+          <div class="af-account-row">
+            <div class="af-account-left">
+              <div class="af-account-icon current">🏦</div>
+              <div><div class="af-account-name">Barclays Current Account</div><div class="af-account-detail">Sort: 20-45-67 · Acct: ****4821</div></div>
+            </div>
+            <div class="af-account-right"><div class="af-account-balance">£12,480.33</div><div class="af-account-meta">Updated 2 min ago</div></div>
+          </div>
+          <div class="af-account-row">
+            <div class="af-account-left">
+              <div class="af-account-icon savings">💰</div>
+              <div><div class="af-account-name">Nationwide Savings</div><div class="af-account-detail">Easy Access Saver · 4.25% AER</div></div>
+            </div>
+            <div class="af-account-right"><div class="af-account-balance">£28,750.00</div><div class="af-account-meta">Updated 1 hr ago</div></div>
+          </div>
+          <div class="af-account-row">
+            <div class="af-account-left">
+              <div class="af-account-icon isa">📈</div>
+              <div><div class="af-account-name">Vanguard Stocks &amp; Shares ISA</div><div class="af-account-detail">2024/25 Allowance: £12,400 remaining</div></div>
+            </div>
+            <div class="af-account-right"><div class="af-account-balance">£38,200.00</div><div class="af-account-meta">Updated today</div></div>
+          </div>
+          <div class="af-account-row">
+            <div class="af-account-left">
+              <div class="af-account-icon credit">💳</div>
+              <div><div class="af-account-name">Amex Cashback Credit Card</div><div class="af-account-detail">Credit limit: £8,000 · Payment due 15 Feb</div></div>
+            </div>
+            <div class="af-account-right"><div class="af-account-balance" style="color: var(--af-red);">-£1,247.60</div><div class="af-account-meta">Balance owing</div></div>
+          </div>
+          <div class="af-account-row">
+            <div class="af-account-left">
+              <div class="af-account-icon savings">🏠</div>
+              <div><div class="af-account-name">HSBC Mortgage</div><div class="af-account-detail">Fixed 2yr · 4.19% · Remortgage Oct 2026</div></div>
+            </div>
+            <div class="af-account-right"><div class="af-account-balance" style="color: var(--af-slate-500);">-£186,420.00</div><div class="af-account-meta">Outstanding balance</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script>
+    async function loadComponent(id, file) {
+      try { const r = await fetch(file); if(r.ok) { document.getElementById(id).innerHTML = await r.text(); document.getElementById(id).querySelectorAll('script').forEach(o => { const s=document.createElement('script'); s.textContent=o.textContent; o.parentNode.replaceChild(s,o); }); }} catch(e){}
+    }
+    loadComponent('header-placeholder','header.html');
+    loadComponent('footer-placeholder','footer.html');
+  </script>
+</body>
+</html>

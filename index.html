@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ambient Finance — Smarter Money Management</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ---- Hero Section ---- */
+    .af-hero {
+      padding: 80px 0 96px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .af-hero::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(ellipse, var(--af-green-100) 0%, transparent 70%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .af-hero-content {
+      position: relative;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .af-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--af-green-50);
+      border: 1px solid var(--af-green-200);
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--af-green-700);
+      margin-bottom: 28px;
+    }
+
+    .af-hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--af-green-500);
+    }
+
+    .af-hero h1 {
+      font-family: var(--af-font-display);
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: var(--af-slate-900);
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .af-hero h1 em {
+      font-style: italic;
+      color: var(--af-green-700);
+    }
+
+    .af-hero-sub {
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--af-slate-500);
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+
+    .af-hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ---- Dashboard Preview ---- */
+    .af-preview {
+      max-width: var(--af-container);
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .af-preview-window {
+      background: var(--af-white);
+      border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-xl);
+      box-shadow: var(--af-shadow-xl);
+      overflow: hidden;
+    }
+
+    .af-preview-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: var(--af-sand-50);
+      border-bottom: 1px solid var(--af-sand-200);
+    }
+
+    .af-preview-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--af-sand-300);
+    }
+
+    .af-preview-body {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .af-preview-card {
+      padding: 24px;
+      border-radius: var(--af-radius-md);
+      background: var(--af-sand-50);
+    }
+
+    .af-preview-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--af-slate-400);
+      margin-bottom: 8px;
+    }
+
+    .af-preview-value {
+      font-family: var(--af-font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--af-slate-900);
+      letter-spacing: -0.02em;
+    }
+
+    .af-preview-value.positive { color: var(--af-green-700); }
+
+    .af-preview-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .af-preview-change.up { color: var(--af-green-600); }
+    .af-preview-change.down { color: var(--af-red); }
+
+    .af-preview-chart {
+      grid-column: 1 / -1;
+      height: 180px;
+      background: var(--af-sand-50);
+      border-radius: var(--af-radius-md);
+      display: flex;
+      align-items: flex-end;
+      padding: 24px;
+      gap: 6px;
+    }
+
+    .af-chart-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: var(--af-green-300);
+      transition: background 0.2s;
+    }
+
+    .af-chart-bar:hover { background: var(--af-green-500); }
+
+    /* ---- Features Section ---- */
+    .af-features {
+      padding: 80px 0;
+      background: var(--af-white);
+      border-top: 1px solid var(--af-sand-200);
+      border-bottom: 1px solid var(--af-sand-200);
+    }
+
+    .af-section-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--af-green-600);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .af-section-title {
+      font-family: var(--af-font-display);
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 500;
+      color: var(--af-slate-900);
+      letter-spacing: -0.02em;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .af-section-desc {
+      text-align: center;
+      font-size: 17px;
+      color: var(--af-slate-500);
+      max-width: 540px;
+      margin: 0 auto 56px;
+    }
+
+    .af-features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: var(--af-container);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .af-feature-card {
+      background: var(--af-sand-50);
+      border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg);
+      padding: 32px 28px;
+      transition: all var(--af-transition);
+    }
+
+    .af-feature-card:hover {
+      border-color: var(--af-green-200);
+      box-shadow: var(--af-shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .af-feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--af-radius-md);
+      background: var(--af-green-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--af-green-700);
+    }
+
+    .af-feature-title {
+      font-family: var(--af-font-display);
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--af-slate-900);
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .af-feature-desc {
+      font-size: 14px;
+      color: var(--af-slate-500);
+      line-height: 1.65;
+    }
+
+    /* ---- Stats Strip ---- */
+    .af-stats {
+      padding: 64px 0;
+    }
+
+    .af-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      max-width: var(--af-container);
+      margin: 0 auto;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    .af-stat-value {
+      font-family: var(--af-font-display);
+      font-size: 36px;
+      font-weight: 500;
+      color: var(--af-green-700);
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .af-stat-label {
+      font-size: 14px;
+      color: var(--af-slate-500);
+    }
+
+    /* ---- CTA Section ---- */
+    .af-cta {
+      padding: 80px 0 96px;
+      text-align: center;
+    }
+
+    .af-cta-card {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 56px 48px;
+      background: var(--af-green-900);
+      border-radius: var(--af-radius-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .af-cta-card::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(ellipse, var(--af-green-700) 0%, transparent 70%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .af-cta-content {
+      position: relative;
+    }
+
+    .af-cta h2 {
+      font-family: var(--af-font-display);
+      font-size: clamp(26px, 3vw, 34px);
+      font-weight: 500;
+      color: var(--af-white);
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .af-cta p {
+      font-size: 16px;
+      color: var(--af-green-300);
+      margin-bottom: 32px;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .af-btn-white {
+      background: var(--af-white);
+      color: var(--af-green-900);
+    }
+    .af-btn-white:hover {
+      background: var(--af-green-50);
+      box-shadow: var(--af-shadow-lg);
+      transform: translateY(-1px);
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 900px) {
+      .af-features-grid { grid-template-columns: 1fr 1fr; }
+      .af-stats-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .af-preview-body { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .af-features-grid { grid-template-columns: 1fr; }
+      .af-stats-grid { grid-template-columns: 1fr 1fr; }
+      .af-preview-body { grid-template-columns: 1fr; }
+      .af-hero { padding: 48px 0 64px; }
+      .af-cta-card { padding: 40px 28px; }
+    }
+
+    /* ---- Load Animation ---- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .af-animate {
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    .af-animate-d1 { animation-delay: 0.1s; }
+    .af-animate-d2 { animation-delay: 0.2s; }
+    .af-animate-d3 { animation-delay: 0.3s; }
+    .af-animate-d4 { animation-delay: 0.4s; }
+  </style>
+</head>
+<body data-page="index">
+
+  <!-- Header (loaded from header.html) -->
+  <div id="header-placeholder"></div>
+
+  <main>
+    <!-- Hero -->
+    <section class="af-hero">
+      <div class="af-hero-content">
+        <div class="af-hero-badge af-animate">
+          <span class="af-hero-badge-dot"></span>
+          Now in public beta
+        </div>
+        <h1 class="af-animate af-animate-d1">Your finances,<br><em>beautifully</em> clear</h1>
+        <p class="af-hero-sub af-animate af-animate-d2">Track spending, grow investments, and get personalised recommendations — all in one calm, intuitive dashboard.</p>
+        <div class="af-hero-actions af-animate af-animate-d3">
+          <a href="dashboard.html" class="af-btn af-btn-primary af-btn-lg">Go to Dashboard</a>
+          <a href="#features" class="af-btn af-btn-secondary af-btn-lg">See Features</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="af-preview af-animate af-animate-d4">
+      <div class="af-preview-window">
+        <div class="af-preview-toolbar">
+          <span class="af-preview-dot"></span>
+          <span class="af-preview-dot"></span>
+          <span class="af-preview-dot"></span>
+        </div>
+        <div class="af-preview-body">
+          <div class="af-preview-card">
+            <div class="af-preview-label">Total Balance</div>
+            <div class="af-preview-value">£84,230</div>
+            <div class="af-preview-change up">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 11V3M7 3L3 7M7 3L11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              +3.2% this month
+            </div>
+          </div>
+          <div class="af-preview-card">
+            <div class="af-preview-label">Monthly Spending</div>
+            <div class="af-preview-value">£2,847</div>
+            <div class="af-preview-change down">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 3V11M7 11L3 7M7 11L11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              -8.1% vs last month
+            </div>
+          </div>
+          <div class="af-preview-card">
+            <div class="af-preview-value positive">+£1,420</div>
+            <div class="af-preview-label" style="margin-bottom:0; margin-top:8px;">Investment Gains (YTD)</div>
+          </div>
+          <div class="af-preview-chart">
+            <div class="af-chart-bar" style="height:45%"></div>
+            <div class="af-chart-bar" style="height:62%"></div>
+            <div class="af-chart-bar" style="height:38%"></div>
+            <div class="af-chart-bar" style="height:71%"></div>
+            <div class="af-chart-bar" style="height:55%"></div>
+            <div class="af-chart-bar" style="height:82%"></div>
+            <div class="af-chart-bar" style="height:68%"></div>
+            <div class="af-chart-bar" style="height:90%"></div>
+            <div class="af-chart-bar" style="height:74%"></div>
+            <div class="af-chart-bar" style="height:85%"></div>
+            <div class="af-chart-bar" style="height:78%"></div>
+            <div class="af-chart-bar" style="height:95%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="af-features" id="features">
+      <div class="af-section-label">Features</div>
+      <h2 class="af-section-title">Everything in one place</h2>
+      <p class="af-section-desc">No more switching between apps. Ambient brings your full financial picture together.</p>
+      <div class="af-features-grid">
+        <div class="af-feature-card">
+          <div class="af-feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <h3 class="af-feature-title">Unified Dashboard</h3>
+          <p class="af-feature-desc">See all your accounts, investments, and spending patterns at a glance. One view, complete clarity.</p>
+        </div>
+        <div class="af-feature-card">
+          <div class="af-feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="af-feature-title">Smart Insights</h3>
+          <p class="af-feature-desc">AI-powered analysis spots trends, flags unusual activity, and highlights opportunities you'd otherwise miss.</p>
+        </div>
+        <div class="af-feature-card">
+          <div class="af-feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 3v18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16l4-5 4 3 5-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 class="af-feature-title">Investment Tracking</h3>
+          <p class="af-feature-desc">Monitor ISAs, SIPPs, and general investments with real-time valuations and performance history.</p>
+        </div>
+        <div class="af-feature-card">
+          <div class="af-feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <h3 class="af-feature-title">Personalised Goals</h3>
+          <p class="af-feature-desc">Set savings targets, track progress, and stay motivated with milestones tailored to your lifestyle.</p>
+        </div>
+        <div class="af-feature-card">
+          <div class="af-feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 15V9M9 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 10h18" stroke="currentColor" stroke-width="1.5"/></svg>
+          </div>
+          <h3 class="af-feature-title">Bank Connections</h3>
+          <p class="af-feature-desc">Connect all major UK banks securely with Open Banking. Automatic transaction import, zero hassle.</p>
+        </div>
+        <div class="af-feature-card">
+          <div class="af-feature-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 class="af-feature-title">Bank-Grade Security</h3>
+          <p class="af-feature-desc">256-bit encryption, FCA regulated, and fully GDPR compliant. Your data never leaves the UK.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="af-stats">
+      <div class="af-stats-grid">
+        <div>
+          <div class="af-stat-value">32k+</div>
+          <div class="af-stat-label">Active users</div>
+        </div>
+        <div>
+          <div class="af-stat-value">£2.1bn</div>
+          <div class="af-stat-label">Assets tracked</div>
+        </div>
+        <div>
+          <div class="af-stat-value">98.7%</div>
+          <div class="af-stat-label">Uptime SLA</div>
+        </div>
+        <div>
+          <div class="af-stat-value">4.8★</div>
+          <div class="af-stat-label">App Store rating</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="af-cta">
+      <div class="af-container">
+        <div class="af-cta-card">
+          <div class="af-cta-content">
+            <h2>Ready to take control?</h2>
+            <p>Join thousands of people building a clearer picture of their financial future.</p>
+            <a href="dashboard.html" class="af-btn af-btn-white af-btn-lg">Get Started Free</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer (loaded from footer.html) -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Component Loader -->
+  <script>
+    async function loadComponent(id, file) {
+      try {
+        const resp = await fetch(file);
+        if (resp.ok) {
+          document.getElementById(id).innerHTML = await resp.text();
+          // Re-run any inline scripts
+          document.getElementById(id).querySelectorAll('script').forEach(function(old) {
+            const s = document.createElement('script');
+            s.textContent = old.textContent;
+            old.parentNode.replaceChild(s, old);
+          });
+        }
+      } catch(e) {
+        console.warn('Could not load ' + file + ':', e);
+      }
+    }
+
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
+  </script>
+</body>
+</html>

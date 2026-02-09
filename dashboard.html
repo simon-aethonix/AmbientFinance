@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header {
+      padding: 48px 0 32px;
+      border-bottom: 1px solid var(--af-sand-200);
+      background: var(--af-white);
+    }
+    .af-page-header h1 {
+      font-family: var(--af-font-display);
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--af-slate-900);
+      letter-spacing: -0.02em;
+    }
+    .af-page-header p {
+      font-size: 16px;
+      color: var(--af-slate-500);
+      margin-top: 6px;
+    }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-placeholder {
+      max-width: var(--af-container);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .af-placeholder-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .af-placeholder-card {
+      background: var(--af-white);
+      border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg);
+      padding: 28px;
+    }
+    .af-placeholder-card .label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--af-slate-400);
+      margin-bottom: 8px;
+    }
+    .af-placeholder-card .value {
+      font-family: var(--af-font-display);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--af-slate-900);
+      letter-spacing: -0.02em;
+    }
+    .af-placeholder-card .change {
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 4px;
+      color: var(--af-green-600);
+    }
+    .af-placeholder-wide {
+      grid-column: 1 / -1;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--af-slate-400);
+      font-size: 14px;
+      border-style: dashed;
+    }
+    .af-placeholder-half {
+      grid-column: span 2;
+      min-height: 200px;
+    }
+
+    @media (max-width: 900px) {
+      .af-placeholder-grid { grid-template-columns: 1fr 1fr; }
+      .af-placeholder-half { grid-column: 1 / -1; }
+    }
+    @media (max-width: 600px) {
+      .af-placeholder-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page="dashboard">
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="af-page-header">
+      <div class="af-placeholder">
+        <h1>Dashboard</h1>
+        <p>Welcome back, John. Here's your financial overview.</p>
+      </div>
+    </div>
+
+    <div class="af-page-body">
+      <div class="af-placeholder">
+        <div class="af-placeholder-grid">
+          <div class="af-placeholder-card">
+            <div class="label">Total Balance</div>
+            <div class="value">£84,230</div>
+            <div class="change">↑ +3.2% this month</div>
+          </div>
+          <div class="af-placeholder-card">
+            <div class="label">Monthly Spending</div>
+            <div class="value">£2,847</div>
+            <div class="change" style="color: var(--af-red);">↓ -8.1% vs last month</div>
+          </div>
+          <div class="af-placeholder-card">
+            <div class="label">Savings Rate</div>
+            <div class="value">24%</div>
+            <div class="change">↑ On track for goal</div>
+          </div>
+          <div class="af-placeholder-card af-placeholder-wide">
+            <span>📊 Spending breakdown chart will render here</span>
+          </div>
+          <div class="af-placeholder-card af-placeholder-half">
+            <div class="label">Recent Transactions</div>
+            <div style="color: var(--af-slate-400); font-size:14px; margin-top:16px;">Transaction list will render here</div>
+          </div>
+          <div class="af-placeholder-card">
+            <div class="label">Quick Actions</div>
+            <div style="color: var(--af-slate-400); font-size:14px; margin-top:16px;">Transfer, pay, invest…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+  <script>
+    async function loadComponent(id, file) {
+      try {
+        const resp = await fetch(file);
+        if (resp.ok) {
+          document.getElementById(id).innerHTML = await resp.text();
+          document.getElementById(id).querySelectorAll('script').forEach(function(old) {
+            const s = document.createElement('script');
+            s.textContent = old.textContent;
+            old.parentNode.replaceChild(s, old);
+          });
+        }
+      } catch(e) { console.warn('Could not load ' + file, e); }
+    }
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
+  </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!-- Ambient Finance Header -->
+<header class="af-header" id="site-header">
+  <div class="af-header-inner">
+    <!-- Logo -->
+    <a href="index.html" class="af-logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="36" height="36" rx="8" fill="#1a6b5a"/>
+        <path d="M8 24L13 12L18 20L23 14L28 24" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="13" cy="12" r="2" fill="#7dd4c0"/>
+        <circle cx="18" cy="20" r="2" fill="#7dd4c0"/>
+        <circle cx="23" cy="14" r="2" fill="#7dd4c0"/>
+      </svg>
+      <span class="af-logo-text">Ambient <span class="af-logo-accent">Finance</span></span>
+    </a>
+
+    <!-- Main Navigation -->
+    <nav class="af-nav" id="main-nav">
+      <a href="index.html" class="af-nav-link" data-page="index">Home</a>
+      <a href="dashboard.html" class="af-nav-link" data-page="dashboard">Dashboard</a>
+      <a href="accounts.html" class="af-nav-link" data-page="accounts">Accounts</a>
+      <a href="investments.html" class="af-nav-link" data-page="investments">Investments</a>
+      <a href="recommendations.html" class="af-nav-link" data-page="recommendations">Recommendations</a>
+    </nav>
+
+    <!-- Right side: User Menu -->
+    <div class="af-header-right">
+      <div class="af-user-menu" id="user-menu">
+        <button class="af-user-btn" id="user-menu-btn" onclick="toggleUserMenu()">
+          <div class="af-avatar">JD</div>
+          <span class="af-user-name">John Doe</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="af-chevron" id="user-chevron">
+            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="af-dropdown" id="user-dropdown">
+          <a href="#" class="af-dropdown-item" onclick="return false;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Account
+          </a>
+          <a href="#" class="af-dropdown-item" onclick="return false;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.8 2.4a1.2 1.2 0 012.4 0 4.8 4.8 0 013.18 2.26 1.2 1.2 0 011.2 2.08 4.8 4.8 0 010 2.52 1.2 1.2 0 01-1.2 2.08A4.8 4.8 0 019.2 13.6a1.2 1.2 0 01-2.4 0 4.8 4.8 0 01-3.18-2.26 1.2 1.2 0 01-1.2-2.08 4.8 4.8 0 010-2.52 1.2 1.2 0 011.2-2.08A4.8 4.8 0 016.8 2.4z" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
+            Settings
+          </a>
+          <a href="#" class="af-dropdown-item" onclick="return false;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+            Preferences
+          </a>
+          <div class="af-dropdown-divider"></div>
+          <a href="#" class="af-dropdown-item af-dropdown-logout" onclick="return false;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3M11 11l3-3-3-3M14 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Log out
+          </a>
+        </div>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button class="af-hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="af-mobile-menu" id="mobile-menu">
+    <a href="index.html" class="af-mobile-link" data-page="index">Home</a>
+    <a href="dashboard.html" class="af-mobile-link" data-page="dashboard">Dashboard</a>
+    <a href="accounts.html" class="af-mobile-link" data-page="accounts">Accounts</a>
+    <a href="investments.html" class="af-mobile-link" data-page="investments">Investments</a>
+    <a href="recommendations.html" class="af-mobile-link" data-page="recommendations">Recommendations</a>
+    <div class="af-mobile-divider"></div>
+    <a href="#" class="af-mobile-link" onclick="return false;">Account</a>
+    <a href="#" class="af-mobile-link" onclick="return false;">Settings</a>
+    <a href="#" class="af-mobile-link" onclick="return false;">Preferences</a>
+    <a href="#" class="af-mobile-link af-mobile-logout" onclick="return false;">Log out</a>
+  </div>
+</header>
+
+<script>
+// Highlight active nav link
+(function() {
+  const page = document.body.getAttribute('data-page');
+  if (page) {
+    document.querySelectorAll('[data-page="' + page + '"]').forEach(function(el) {
+      el.classList.add('active');
+    });
+  }
+})();
+
+function toggleUserMenu() {
+  const dropdown = document.getElementById('user-dropdown');
+  const chevron = document.getElementById('user-chevron');
+  dropdown.classList.toggle('open');
+  chevron.classList.toggle('rotated');
+
+  // Close on outside click
+  function closeMenu(e) {
+    if (!document.getElementById('user-menu').contains(e.target)) {
+      dropdown.classList.remove('open');
+      chevron.classList.remove('rotated');
+      document.removeEventListener('click', closeMenu);
+    }
+  }
+  setTimeout(function() { document.addEventListener('click', closeMenu); }, 10);
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const btn = document.getElementById('hamburger-btn');
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+}
+</script>

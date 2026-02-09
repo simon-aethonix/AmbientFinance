@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recommendations — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header { padding: 48px 0 32px; border-bottom: 1px solid var(--af-sand-200); background: var(--af-white); }
+    .af-page-header h1 { font-family: var(--af-font-display); font-size: 32px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-page-header p { font-size: 16px; color: var(--af-slate-500); margin-top: 6px; }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
+
+    .af-rec-list { display: flex; flex-direction: column; gap: 20px; }
+
+    .af-rec-card {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 28px 32px;
+      display: flex; gap: 24px; align-items: flex-start;
+      transition: all var(--af-transition);
+    }
+    .af-rec-card:hover { border-color: var(--af-green-200); box-shadow: var(--af-shadow-sm); }
+
+    .af-rec-icon {
+      width: 52px; height: 52px; border-radius: var(--af-radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .af-rec-icon.savings { background: var(--af-green-100); }
+    .af-rec-icon.invest { background: #e8f0fe; }
+    .af-rec-icon.debt { background: #fef3e2; }
+    .af-rec-icon.tax { background: #f3e8fe; }
+    .af-rec-icon.insurance { background: #fee8e8; }
+
+    .af-rec-body { flex: 1; }
+
+    .af-rec-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 50px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; margin-bottom: 10px;
+    }
+    .af-rec-badge.high { background: var(--af-green-100); color: var(--af-green-800); }
+    .af-rec-badge.medium { background: #fef3e2; color: #92640d; }
+    .af-rec-badge.info { background: var(--af-slate-100); color: var(--af-slate-600); }
+
+    .af-rec-title {
+      font-family: var(--af-font-display); font-size: 19px; font-weight: 500;
+      color: var(--af-slate-900); margin-bottom: 8px; letter-spacing: -0.01em;
+    }
+
+    .af-rec-desc { font-size: 14px; color: var(--af-slate-500); line-height: 1.65; margin-bottom: 14px; }
+
+    .af-rec-impact {
+      font-size: 13px; font-weight: 600; color: var(--af-green-700);
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: var(--af-green-50); border-radius: var(--af-radius-sm);
+    }
+
+    .af-rec-action {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; font-size: 13px; font-weight: 600;
+      color: var(--af-green-700); background: var(--af-white);
+      border: 1.5px solid var(--af-green-200); border-radius: var(--af-radius-sm);
+      cursor: default; margin-left: 10px; transition: all var(--af-transition);
+    }
+    .af-rec-action:hover { background: var(--af-green-50); }
+
+    @media (max-width: 600px) {
+      .af-rec-card { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body data-page="recommendations">
+  <div id="header-placeholder"></div>
+  <main>
+    <div class="af-page-header">
+      <div class="af-inner"><h1>Recommendations</h1><p>Personalised suggestions based on your financial activity.</p></div>
+    </div>
+    <div class="af-page-body">
+      <div class="af-inner">
+        <div class="af-rec-list">
+
+          <div class="af-rec-card">
+            <div class="af-rec-icon savings">💡</div>
+            <div class="af-rec-body">
+              <span class="af-rec-badge high">High Impact</span>
+              <h3 class="af-rec-title">Max out your ISA before April</h3>
+              <p class="af-rec-desc">You have £12,400 of your 2024/25 ISA allowance remaining. Based on your current savings rate, you could contribute an additional £3,100/month to use it before the tax year ends on 5 April.</p>
+              <span class="af-rec-impact">⚡ Potential tax saving: £620/yr</span>
+              <span class="af-rec-action" onclick="return false;">Review ISA →</span>
+            </div>
+          </div>
+
+          <div class="af-rec-card">
+            <div class="af-rec-icon debt">💳</div>
+            <div class="af-rec-body">
+              <span class="af-rec-badge high">High Impact</span>
+              <h3 class="af-rec-title">Clear your credit card balance</h3>
+              <p class="af-rec-desc">Your Amex card has a £1,247.60 balance. At the current APR, carrying this forward costs roughly £18/month in interest. You have sufficient funds in your current account to clear it.</p>
+              <span class="af-rec-impact">⚡ Save £216/yr in interest</span>
+              <span class="af-rec-action" onclick="return false;">Set up payment →</span>
+            </div>
+          </div>
+
+          <div class="af-rec-card">
+            <div class="af-rec-icon invest">📊</div>
+            <div class="af-rec-body">
+              <span class="af-rec-badge medium">Medium Impact</span>
+              <h3 class="af-rec-title">Rebalance your portfolio</h3>
+              <p class="af-rec-desc">Your UK equity allocation has drifted to 28% vs your 20% target due to recent FTSE performance. Consider trimming your L&amp;G UK Index position and reallocating to your global fund.</p>
+              <span class="af-rec-impact">🎯 Reduce concentration risk</span>
+              <span class="af-rec-action" onclick="return false;">View allocation →</span>
+            </div>
+          </div>
+
+          <div class="af-rec-card">
+            <div class="af-rec-icon tax">🏠</div>
+            <div class="af-rec-body">
+              <span class="af-rec-badge medium">Medium Impact</span>
+              <h3 class="af-rec-title">Start mortgage remortgage research</h3>
+              <p class="af-rec-desc">Your HSBC fixed rate ends in October 2026 — roughly 20 months away. Lenders typically allow you to lock in a rate 6 months ahead, so consider starting research in early 2026.</p>
+              <span class="af-rec-impact">📅 Set a reminder for Jan 2026</span>
+              <span class="af-rec-action" onclick="return false;">Set reminder →</span>
+            </div>
+          </div>
+
+          <div class="af-rec-card">
+            <div class="af-rec-icon insurance">🔒</div>
+            <div class="af-rec-body">
+              <span class="af-rec-badge info">Informational</span>
+              <h3 class="af-rec-title">Review your emergency fund</h3>
+              <p class="af-rec-desc">Your Nationwide savings (£28,750) comfortably covers 10 months of expenses at current spending levels. This exceeds the recommended 3–6 months — you might consider moving the excess into higher-return investments.</p>
+              <span class="af-rec-impact">💰 Potential extra growth: £400–800/yr</span>
+              <span class="af-rec-action" onclick="return false;">Explore options →</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script>
+    async function loadComponent(id, file) {
+      try { const r = await fetch(file); if(r.ok) { document.getElementById(id).innerHTML = await r.text(); document.getElementById(id).querySelectorAll('script').forEach(o => { const s=document.createElement('script'); s.textContent=o.textContent; o.parentNode.replaceChild(s,o); }); }} catch(e){}
+    }
+    loadComponent('header-placeholder','header.html');
+    loadComponent('footer-placeholder','footer.html');
+  </script>
+</body>
+</html>

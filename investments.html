@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investments — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header { padding: 48px 0 32px; border-bottom: 1px solid var(--af-sand-200); background: var(--af-white); }
+    .af-page-header h1 { font-family: var(--af-font-display); font-size: 32px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-page-header p { font-size: 16px; color: var(--af-slate-500); margin-top: 6px; }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
+
+    .af-inv-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
+    .af-inv-stat {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 24px;
+    }
+    .af-inv-stat .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 8px; }
+    .af-inv-stat .value { font-family: var(--af-font-display); font-size: 24px; font-weight: 500; color: var(--af-slate-900); }
+    .af-inv-stat .sub { font-size: 13px; margin-top: 4px; }
+    .af-inv-stat .sub.up { color: var(--af-green-600); }
+    .af-inv-stat .sub.down { color: var(--af-red); }
+
+    .af-inv-table {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden;
+    }
+    .af-inv-table table { width: 100%; border-collapse: collapse; }
+    .af-inv-table th {
+      text-align: left; padding: 14px 20px; font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400);
+      background: var(--af-sand-50); border-bottom: 1px solid var(--af-sand-200);
+    }
+    .af-inv-table td {
+      padding: 16px 20px; font-size: 14px; color: var(--af-slate-700);
+      border-bottom: 1px solid var(--af-sand-100);
+    }
+    .af-inv-table tr:last-child td { border-bottom: none; }
+    .af-inv-table tr:hover td { background: var(--af-sand-50); }
+    .af-inv-name { font-weight: 600; color: var(--af-slate-800); }
+    .af-inv-ticker { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; }
+    .gain { color: var(--af-green-600); font-weight: 500; }
+    .loss { color: var(--af-red); font-weight: 500; }
+
+    @media (max-width: 900px) { .af-inv-summary { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) {
+      .af-inv-summary { grid-template-columns: 1fr; }
+      .af-inv-table { overflow-x: auto; }
+      .af-inv-table table { min-width: 600px; }
+    }
+  </style>
+</head>
+<body data-page="investments">
+  <div id="header-placeholder"></div>
+  <main>
+    <div class="af-page-header">
+      <div class="af-inner"><h1>Investments</h1><p>Track your portfolio performance across all accounts.</p></div>
+    </div>
+    <div class="af-page-body">
+      <div class="af-inner">
+        <div class="af-inv-summary">
+          <div class="af-inv-stat">
+            <div class="label">Portfolio Value</div>
+            <div class="value">£38,200</div>
+            <div class="sub up">↑ +£1,420 (3.9%) YTD</div>
+          </div>
+          <div class="af-inv-stat">
+            <div class="label">Total Invested</div>
+            <div class="value">£36,780</div>
+            <div class="sub" style="color: var(--af-slate-400);">Since Jan 2021</div>
+          </div>
+          <div class="af-inv-stat">
+            <div class="label">Dividends (YTD)</div>
+            <div class="value">£482</div>
+            <div class="sub up">↑ +12% vs last year</div>
+          </div>
+          <div class="af-inv-stat">
+            <div class="label">ISA Allowance Left</div>
+            <div class="value">£12,400</div>
+            <div class="sub" style="color: var(--af-slate-400);">of £20,000 (2024/25)</div>
+          </div>
+        </div>
+
+        <div class="af-inv-table">
+          <table>
+            <thead>
+              <tr><th>Holding</th><th>Shares</th><th>Avg. Cost</th><th>Current</th><th>Value</th><th>Gain/Loss</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="af-inv-name">Vanguard FTSE Global All Cap</div><div class="af-inv-ticker">VAFTGAG · Fund</div></td>
+                <td>142.3</td><td>£128.40</td><td>£134.20</td><td>£19,098.66</td><td class="gain">+£825.54 (+4.5%)</td>
+              </tr>
+              <tr>
+                <td><div class="af-inv-name">iShares Core MSCI World</div><div class="af-inv-ticker">SWDA · ETF</div></td>
+                <td>85.0</td><td>£82.10</td><td>£86.40</td><td>£7,344.00</td><td class="gain">+£365.50 (+5.2%)</td>
+              </tr>
+              <tr>
+                <td><div class="af-inv-name">Fundsmith Equity</div><div class="af-inv-ticker">FEET · Fund</div></td>
+                <td>24.8</td><td>£254.00</td><td>£248.60</td><td>£6,165.28</td><td class="loss">-£133.92 (-2.1%)</td>
+              </tr>
+              <tr>
+                <td><div class="af-inv-name">Legal &amp; General UK Index</div><div class="af-inv-ticker">LGUKIA · Fund</div></td>
+                <td>1,840</td><td>£2.82</td><td>£3.04</td><td>£5,593.60</td><td class="gain">+£404.80 (+7.8%)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script>
+    async function loadComponent(id, file) {
+      try { const r = await fetch(file); if(r.ok) { document.getElementById(id).innerHTML = await r.text(); document.getElementById(id).querySelectorAll('script').forEach(o => { const s=document.createElement('script'); s.textContent=o.textContent; o.parentNode.replaceChild(s,o); }); }} catch(e){}
+    }
+    loadComponent('header-placeholder','header.html');
+    loadComponent('footer-placeholder','footer.html');
+  </script>
+</body>
+</html>
