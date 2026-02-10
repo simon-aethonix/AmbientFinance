@@ -12,44 +12,218 @@
     .af-page-body { padding: 40px 0 80px; }
     .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
 
-    .af-account-list { display: flex; flex-direction: column; gap: 16px; }
-
-    .af-account-row {
-      background: var(--af-white);
-      border: 1px solid var(--af-sand-200);
-      border-radius: var(--af-radius-lg);
-      padding: 24px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: all var(--af-transition);
+    /* ---- Tabs ---- */
+    .af-tabs { display: flex; gap: 4px; margin-bottom: 32px; border-bottom: 2px solid var(--af-sand-200); }
+    .af-tab {
+      padding: 12px 24px; font-size: 14px; font-weight: 600; color: var(--af-slate-500);
+      cursor: pointer; border: none; background: none; font-family: var(--af-font-body);
+      position: relative; transition: color var(--af-transition);
+      margin-bottom: -2px; border-bottom: 2px solid transparent;
     }
-    .af-account-row:hover { border-color: var(--af-green-200); box-shadow: var(--af-shadow-sm); }
+    .af-tab:hover { color: var(--af-slate-800); }
+    .af-tab.active { color: var(--af-green-700); border-bottom-color: var(--af-green-700); }
+    .af-tab-panel { display: none; }
+    .af-tab-panel.active { display: block; }
 
-    .af-account-left { display: flex; align-items: center; gap: 16px; }
-    .af-account-icon {
+    /* ---- Accordion ---- */
+    .af-accordion { display: flex; flex-direction: column; gap: 12px; }
+    .af-acc-item {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden; transition: all var(--af-transition);
+    }
+    .af-acc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; cursor: pointer; transition: background var(--af-transition); user-select: none;
+    }
+    .af-acc-header:hover { background: var(--af-green-50); }
+    .af-acc-item.open .af-acc-header { background: var(--af-green-50); border-bottom: 1px solid var(--af-sand-200); }
+    .af-acc-left { display: flex; align-items: center; gap: 16px; }
+    .af-acc-icon {
       width: 44px; height: 44px; border-radius: var(--af-radius-md);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
+      display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
     }
-    .af-account-icon.current { background: var(--af-green-100); }
-    .af-account-icon.savings { background: var(--af-green-50); }
-    .af-account-icon.credit { background: #fef3e2; }
-    .af-account-icon.isa { background: #e8f0fe; }
-
-    .af-account-name { font-weight: 600; color: var(--af-slate-800); font-size: 15px; }
-    .af-account-detail { font-size: 13px; color: var(--af-slate-400); margin-top: 2px; }
-
-    .af-account-right { text-align: right; }
-    .af-account-balance {
+    .af-acc-icon.current { background: var(--af-green-100); }
+    .af-acc-icon.savings { background: var(--af-green-50); border: 1px solid var(--af-green-200); }
+    .af-acc-icon.credit { background: #fef3e2; }
+    .af-acc-icon.isa { background: #e8f0fe; }
+    .af-acc-icon.mortgage { background: var(--af-sand-100); }
+    .af-acc-name { font-weight: 600; color: var(--af-slate-800); font-size: 15px; }
+    .af-acc-detail { font-size: 13px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-acc-right { display: flex; align-items: center; gap: 16px; }
+    .af-acc-balance {
       font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
-      color: var(--af-slate-900); letter-spacing: -0.02em;
+      color: var(--af-slate-900); letter-spacing: -0.02em; text-align: right;
     }
-    .af-account-meta { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-acc-meta { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; text-align: right; }
+    .af-acc-chevron {
+      width: 20px; height: 20px; color: var(--af-slate-400);
+      transition: transform 0.3s ease; flex-shrink: 0;
+    }
+    .af-acc-item.open .af-acc-chevron { transform: rotate(180deg); }
+    .af-acc-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+    .af-acc-item.open .af-acc-body { max-height: 2000px; }
+    .af-acc-body-inner { padding: 0 28px 24px; }
 
+    /* ---- Transactions ---- */
+    .af-txn-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0 12px; border-bottom: 1px solid var(--af-sand-100);
+    }
+    .af-txn-header h4 {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400);
+    }
+    .af-txn-date-group {
+      font-size: 12px; font-weight: 600; color: var(--af-slate-400);
+      padding: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .af-txn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--af-sand-50);
+    }
+    .af-txn:last-child { border-bottom: none; }
+    .af-txn-left { display: flex; align-items: center; gap: 12px; }
+    .af-txn-cat-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .af-txn-cat-icon.groceries { background: #e8f5e9; }
+    .af-txn-cat-icon.transport { background: #e3f2fd; }
+    .af-txn-cat-icon.utilities { background: #fff3e0; }
+    .af-txn-cat-icon.dining { background: #fce4ec; }
+    .af-txn-cat-icon.shopping { background: #f3e5f5; }
+    .af-txn-cat-icon.income { background: var(--af-green-100); }
+    .af-txn-cat-icon.health { background: #e8eaf6; }
+    .af-txn-cat-icon.subscriptions { background: #e0f7fa; }
+    .af-txn-cat-icon.kids { background: #fff8e1; }
+    .af-txn-cat-icon.home { background: var(--af-sand-100); }
+    .af-txn-cat-icon.transfer { background: var(--af-slate-100); }
+    .af-txn-cat-icon.fuel { background: #efebe9; }
+    .af-txn-name { font-size: 14px; font-weight: 500; color: var(--af-slate-800); }
+    .af-txn-category { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-txn-cat-tag { padding: 1px 8px; border-radius: 50px; background: var(--af-sand-100); font-size: 11px; color: var(--af-slate-500); }
+    .af-txn-right { text-align: right; }
+    .af-txn-amount { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .af-txn-amount.debit { color: var(--af-slate-800); }
+    .af-txn-amount.credit { color: var(--af-green-700); }
+    .af-txn-balance { font-size: 11px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-txn-alert {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 50px; background: #fff3e0; color: #e65100;
+      font-size: 11px; font-weight: 600; margin-left: 8px;
+    }
+
+    /* ---- Cash Flow ---- */
+    .af-cf-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
+    .af-cf-card {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 24px;
+    }
+    .af-cf-card .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 8px; }
+    .af-cf-card .value { font-family: var(--af-font-display); font-size: 26px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-cf-card .sub { font-size: 13px; margin-top: 4px; color: var(--af-slate-400); }
+    .af-cf-timeline {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden;
+    }
+    .af-cf-timeline-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--af-sand-200);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .af-cf-timeline-header h3 { font-family: var(--af-font-display); font-size: 18px; font-weight: 500; color: var(--af-slate-900); }
+    .af-cf-timeline-header .period { font-size: 13px; color: var(--af-slate-400); }
+    .af-cf-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px; border-bottom: 1px solid var(--af-sand-50);
+    }
+    .af-cf-row:last-child { border-bottom: none; }
+    .af-cf-row:hover { background: var(--af-sand-50); }
+    .af-cf-row-left { display: flex; align-items: center; gap: 12px; }
+    .af-cf-row-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .af-cf-row-icon.bill { background: #fff3e0; }
+    .af-cf-row-icon.income-icon { background: var(--af-green-100); }
+    .af-cf-row-icon.dd { background: #e3f2fd; }
+    .af-cf-row-name { font-size: 14px; font-weight: 500; color: var(--af-slate-800); }
+    .af-cf-row-date { font-size: 12px; color: var(--af-slate-400); margin-top: 1px; }
+    .af-cf-row-amount { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .af-cf-row-amount.out { color: var(--af-slate-700); }
+    .af-cf-row-amount.in { color: var(--af-green-700); }
+    .af-cf-confidence {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 500;
+    }
+    .af-cf-confidence.high { background: var(--af-green-100); color: var(--af-green-800); }
+    .af-cf-confidence.medium { background: #fef3e2; color: #92640d; }
+
+    /* ---- Pay Day ---- */
+    .af-pd-hero {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-xl); padding: 40px; text-align: center;
+      margin-bottom: 24px; position: relative; overflow: hidden;
+    }
+    .af-pd-hero::before {
+      content: ''; position: absolute; top: -60%; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 500px;
+      background: radial-gradient(ellipse, var(--af-green-100) 0%, transparent 70%);
+      opacity: 0.4; pointer-events: none;
+    }
+    .af-pd-hero-content { position: relative; }
+    .af-pd-countdown {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-green-600); margin-bottom: 8px;
+    }
+    .af-pd-amount {
+      font-family: var(--af-font-display); font-size: 48px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.03em; margin-bottom: 8px;
+    }
+    .af-pd-label { font-size: 16px; color: var(--af-slate-500); margin-bottom: 24px; }
+    .af-pd-bar-track {
+      max-width: 400px; margin: 0 auto; height: 12px;
+      background: var(--af-sand-200); border-radius: 6px; overflow: hidden;
+    }
+    .af-pd-bar-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, var(--af-green-600), var(--af-green-400));
+    }
+    .af-pd-bar-labels {
+      display: flex; justify-content: space-between; max-width: 400px; margin: 8px auto 0;
+      font-size: 12px; color: var(--af-slate-400);
+    }
+    .af-pd-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .af-pd-col {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden;
+    }
+    .af-pd-col-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--af-sand-200);
+      font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400);
+    }
+    .af-pd-col-header.committed { color: var(--af-red); }
+    .af-pd-col-header.discretionary { color: var(--af-green-700); }
+    .af-pd-line {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 20px; border-bottom: 1px solid var(--af-sand-50); font-size: 14px;
+    }
+    .af-pd-line:last-child { border-bottom: none; }
+    .af-pd-line-name { color: var(--af-slate-700); }
+    .af-pd-line-amount { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--af-slate-800); }
+    .af-pd-total {
+      display: flex; justify-content: space-between; padding: 14px 20px;
+      font-weight: 700; border-top: 2px solid var(--af-sand-200); font-size: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .af-cf-summary { grid-template-columns: 1fr; }
+      .af-pd-breakdown { grid-template-columns: 1fr; }
+    }
     @media (max-width: 600px) {
-      .af-account-row { flex-direction: column; align-items: flex-start; gap: 12px; }
-      .af-account-right { text-align: left; }
+      .af-acc-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .af-acc-right { width: 100%; justify-content: space-between; }
+      .af-tabs { overflow-x: auto; }
+      .af-tab { white-space: nowrap; padding: 12px 16px; }
     }
   </style>
 </head>
@@ -57,57 +231,584 @@
   <div id="header-placeholder"></div>
   <main>
     <div class="af-page-header">
-      <div class="af-inner"><h1>Accounts</h1><p>All your connected bank accounts and cards.</p></div>
+      <div class="af-inner">
+        <h1>Accounts</h1>
+        <p>Your single source of truth — every account, every transaction, one place.</p>
+      </div>
     </div>
     <div class="af-page-body">
       <div class="af-inner">
-        <div class="af-account-list">
-          <div class="af-account-row">
-            <div class="af-account-left">
-              <div class="af-account-icon current">🏦</div>
-              <div><div class="af-account-name">Barclays Current Account</div><div class="af-account-detail">Sort: 20-45-67 · Acct: ****4821</div></div>
+
+        <!-- Tabs -->
+        <div class="af-tabs">
+          <button class="af-tab active" data-tab="accounts" onclick="switchTab('accounts')">My Accounts</button>
+          <button class="af-tab" data-tab="cashflow" onclick="switchTab('cashflow')">Cash Flow</button>
+          <button class="af-tab" data-tab="payday" onclick="switchTab('payday')">Pay Day</button>
+        </div>
+
+        <!-- ===== TAB: My Accounts ===== -->
+        <div class="af-tab-panel active" id="panel-accounts">
+          <div class="af-accordion">
+
+            <!-- First Direct Current Account -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon current">🏦</div>
+                  <div>
+                    <div class="af-acc-name">First Direct Current Account</div>
+                    <div class="af-acc-detail">Sort: 40-47-86 · Acct: ****3091</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance">£2,134.57</div>
+                    <div class="af-acc-meta">Updated 3 min ago</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-txn-header">
+                    <h4>Recent Transactions</h4>
+                    <span style="font-size:12px; color: var(--af-slate-400);">Auto-categorised</span>
+                  </div>
+
+                  <div class="af-txn-date-group">Today — 10 Feb 2026</div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon groceries">🛒</div>
+                      <div>
+                        <div class="af-txn-name">Tesco Superstore</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Groceries</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£67.43</div>
+                      <div class="af-txn-balance">Bal: £2,134.57</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon transport">🚂</div>
+                      <div>
+                        <div class="af-txn-name">Trainline — Lancaster to Manchester</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Transport</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£18.90</div>
+                      <div class="af-txn-balance">Bal: £2,202.00</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn-date-group">9 Feb 2026</div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon dining">🍕</div>
+                      <div>
+                        <div class="af-txn-name">Domino's Pizza</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Dining Out</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£24.99</div>
+                      <div class="af-txn-balance">Bal: £2,220.90</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon fuel">⛽</div>
+                      <div>
+                        <div class="af-txn-name">Shell — Carnforth Services</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Fuel</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£58.02</div>
+                      <div class="af-txn-balance">Bal: £2,245.89</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn-date-group">7 Feb 2026</div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon subscriptions">📺</div>
+                      <div>
+                        <div class="af-txn-name">Netflix</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Subscriptions</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£10.99</div>
+                      <div class="af-txn-balance">Bal: £2,303.91</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon shopping">🛍️</div>
+                      <div>
+                        <div class="af-txn-name">
+                          Amazon Marketplace
+                          <span class="af-txn-alert">⚠️ Unusual — £89 above average</span>
+                        </div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Shopping</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£124.99</div>
+                      <div class="af-txn-balance">Bal: £2,314.90</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn-date-group">5 Feb 2026</div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon kids">🧒</div>
+                      <div>
+                        <div class="af-txn-name">Little Acorns Nursery</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Childcare</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£680.00</div>
+                      <div class="af-txn-balance">Bal: £2,439.89</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon utilities">💡</div>
+                      <div>
+                        <div class="af-txn-name">British Gas — DD</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Utilities</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£142.00</div>
+                      <div class="af-txn-balance">Bal: £3,119.89</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon home">🏠</div>
+                      <div>
+                        <div class="af-txn-name">Council Tax — Lancaster CC</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Home</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount debit">-£168.00</div>
+                      <div class="af-txn-balance">Bal: £3,261.89</div>
+                    </div>
+                  </div>
+
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon income">💷</div>
+                      <div>
+                        <div class="af-txn-name">ACME Engineering Ltd — Salary</div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Income</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right">
+                      <div class="af-txn-amount credit">+£2,680.00</div>
+                      <div class="af-txn-balance">Bal: £3,429.89</div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
             </div>
-            <div class="af-account-right"><div class="af-account-balance">£12,480.33</div><div class="af-account-meta">Updated 2 min ago</div></div>
-          </div>
-          <div class="af-account-row">
-            <div class="af-account-left">
-              <div class="af-account-icon savings">💰</div>
-              <div><div class="af-account-name">Nationwide Savings</div><div class="af-account-detail">Easy Access Saver · 4.25% AER</div></div>
+
+            <!-- Nationwide Savings -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon savings">💰</div>
+                  <div>
+                    <div class="af-acc-name">Nationwide Savings</div>
+                    <div class="af-acc-detail">Easy Access Saver · 4.25% AER</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance">£8,240.00</div>
+                    <div class="af-acc-meta">Updated 1 hr ago</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-txn-header"><h4>Recent Transactions</h4></div>
+                  <div class="af-txn-date-group">1 Feb 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon income">💷</div>
+                      <div><div class="af-txn-name">Interest Payment</div><div class="af-txn-category"><span class="af-txn-cat-tag">Interest</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£28.42</div></div>
+                  </div>
+                  <div class="af-txn-date-group">5 Jan 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon transfer">🔄</div>
+                      <div><div class="af-txn-name">Transfer from First Direct</div><div class="af-txn-category"><span class="af-txn-cat-tag">Transfer</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£200.00</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon income">💷</div>
+                      <div><div class="af-txn-name">Interest Payment</div><div class="af-txn-category"><span class="af-txn-cat-tag">Interest</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£27.38</div></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="af-account-right"><div class="af-account-balance">£28,750.00</div><div class="af-account-meta">Updated 1 hr ago</div></div>
-          </div>
-          <div class="af-account-row">
-            <div class="af-account-left">
-              <div class="af-account-icon isa">📈</div>
-              <div><div class="af-account-name">Vanguard Stocks &amp; Shares ISA</div><div class="af-account-detail">2024/25 Allowance: £12,400 remaining</div></div>
+
+            <!-- Vanguard ISA -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon isa">📈</div>
+                  <div>
+                    <div class="af-acc-name">Vanguard Stocks &amp; Shares ISA</div>
+                    <div class="af-acc-detail">2024/25 Allowance: £12,400 remaining</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance">£14,820.00</div>
+                    <div class="af-acc-meta">Updated today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-txn-header"><h4>Recent Activity</h4></div>
+                  <div class="af-txn-date-group">1 Feb 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon transfer">🔄</div>
+                      <div><div class="af-txn-name">Monthly contribution — FTSE Global All Cap</div><div class="af-txn-category"><span class="af-txn-cat-tag">Investment</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£150.00</div></div>
+                  </div>
+                  <div class="af-txn-date-group">15 Jan 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon income">💷</div>
+                      <div><div class="af-txn-name">Dividend — iShares MSCI World</div><div class="af-txn-category"><span class="af-txn-cat-tag">Dividend</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£32.18</div></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="af-account-right"><div class="af-account-balance">£38,200.00</div><div class="af-account-meta">Updated today</div></div>
-          </div>
-          <div class="af-account-row">
-            <div class="af-account-left">
-              <div class="af-account-icon credit">💳</div>
-              <div><div class="af-account-name">Amex Cashback Credit Card</div><div class="af-account-detail">Credit limit: £8,000 · Payment due 15 Feb</div></div>
+
+            <!-- Barclaycard -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon credit">💳</div>
+                  <div>
+                    <div class="af-acc-name">Barclaycard Platinum</div>
+                    <div class="af-acc-detail">Credit limit: £4,500 · Payment due 15 Feb</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance" style="color: var(--af-red);">-£847.32</div>
+                    <div class="af-acc-meta">Balance owing</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-txn-header"><h4>Recent Transactions</h4></div>
+                  <div class="af-txn-date-group">8 Feb 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon groceries">🛒</div>
+                      <div><div class="af-txn-name">Sainsbury's</div><div class="af-txn-category"><span class="af-txn-cat-tag">Groceries</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£54.18</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon health">💊</div>
+                      <div><div class="af-txn-name">Boots Pharmacy</div><div class="af-txn-category"><span class="af-txn-cat-tag">Health</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£12.49</div></div>
+                  </div>
+                  <div class="af-txn-date-group">3 Feb 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon shopping">🛍️</div>
+                      <div>
+                        <div class="af-txn-name">
+                          TK Maxx
+                          <span class="af-txn-alert">⚠️ Unusual merchant</span>
+                        </div>
+                        <div class="af-txn-category"><span class="af-txn-cat-tag">Shopping</span></div>
+                      </div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£79.99</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon dining">☕</div>
+                      <div><div class="af-txn-name">Costa Coffee</div><div class="af-txn-category"><span class="af-txn-cat-tag">Dining Out</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£4.85</div></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="af-account-right"><div class="af-account-balance" style="color: var(--af-red);">-£1,247.60</div><div class="af-account-meta">Balance owing</div></div>
-          </div>
-          <div class="af-account-row">
-            <div class="af-account-left">
-              <div class="af-account-icon savings">🏠</div>
-              <div><div class="af-account-name">HSBC Mortgage</div><div class="af-account-detail">Fixed 2yr · 4.19% · Remortgage Oct 2026</div></div>
+
+            <!-- HSBC Mortgage -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon mortgage">🏠</div>
+                  <div>
+                    <div class="af-acc-name">HSBC Mortgage</div>
+                    <div class="af-acc-detail">Fixed 2yr · 4.19% · Remortgage Oct 2026</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance" style="color: var(--af-slate-500);">-£186,420.00</div>
+                    <div class="af-acc-meta">Outstanding balance</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-txn-header"><h4>Recent Payments</h4></div>
+                  <div class="af-txn-date-group">1 Feb 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon home">🏠</div>
+                      <div><div class="af-txn-name">Mortgage Payment (DD)</div><div class="af-txn-category"><span class="af-txn-cat-tag">Mortgage</span> · £412 interest / £530 capital</div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£942.00</div></div>
+                  </div>
+                  <div class="af-txn-date-group">1 Jan 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon home">🏠</div>
+                      <div><div class="af-txn-name">Mortgage Payment (DD)</div><div class="af-txn-category"><span class="af-txn-cat-tag">Mortgage</span> · £414 interest / £528 capital</div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£942.00</div></div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="af-account-right"><div class="af-account-balance" style="color: var(--af-slate-500);">-£186,420.00</div><div class="af-account-meta">Outstanding balance</div></div>
+
           </div>
         </div>
+
+        <!-- ===== TAB: Cash Flow ===== -->
+        <div class="af-tab-panel" id="panel-cashflow">
+          <div class="af-cf-summary">
+            <div class="af-cf-card">
+              <div class="label">Predicted Income (Feb)</div>
+              <div class="value">£2,680</div>
+              <div class="sub">Based on last 6 months</div>
+            </div>
+            <div class="af-cf-card">
+              <div class="label">Committed Outgoings</div>
+              <div class="value">£2,187</div>
+              <div class="sub">Bills, DDs &amp; standing orders</div>
+            </div>
+            <div class="af-cf-card">
+              <div class="label">Forecast Disposable</div>
+              <div class="value" style="color: var(--af-green-700);">£493</div>
+              <div class="sub">After all commitments</div>
+            </div>
+          </div>
+
+          <div class="af-cf-timeline">
+            <div class="af-cf-timeline-header">
+              <h3>Upcoming — Next 30 Days</h3>
+              <span class="period">10 Feb – 12 Mar 2026</span>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon bill">📱</div>
+                <div><div class="af-cf-row-name">Three Mobile</div><div class="af-cf-row-date">12 Feb · Direct Debit</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence high">High confidence</span>
+                <div class="af-cf-row-amount out">-£34.00</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon bill">💳</div>
+                <div><div class="af-cf-row-name">Barclaycard Payment</div><div class="af-cf-row-date">15 Feb · Direct Debit</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence high">High confidence</span>
+                <div class="af-cf-row-amount out">-£847.32</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon dd">🌐</div>
+                <div><div class="af-cf-row-name">Sky Broadband</div><div class="af-cf-row-date">18 Feb · Direct Debit</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence high">High confidence</span>
+                <div class="af-cf-row-amount out">-£43.00</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon bill">🚗</div>
+                <div><div class="af-cf-row-name">Admiral Car Insurance</div><div class="af-cf-row-date">22 Feb · Direct Debit</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence high">High confidence</span>
+                <div class="af-cf-row-amount out">-£48.60</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon bill">🏠</div>
+                <div><div class="af-cf-row-name">HSBC Mortgage</div><div class="af-cf-row-date">1 Mar · Direct Debit</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence high">High confidence</span>
+                <div class="af-cf-row-amount out">-£942.00</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon income-icon">💷</div>
+                <div><div class="af-cf-row-name">ACME Engineering Ltd — Salary</div><div class="af-cf-row-date">5 Mar · Predicted</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence medium">Based on pattern</span>
+                <div class="af-cf-row-amount in">+£2,680.00</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon bill">💡</div>
+                <div><div class="af-cf-row-name">British Gas</div><div class="af-cf-row-date">5 Mar · Direct Debit</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence medium">Est. ±£15</span>
+                <div class="af-cf-row-amount out">-£142.00</div>
+              </div>
+            </div>
+            <div class="af-cf-row">
+              <div class="af-cf-row-left">
+                <div class="af-cf-row-icon bill">🧒</div>
+                <div><div class="af-cf-row-name">Little Acorns Nursery</div><div class="af-cf-row-date">5 Mar · Standing Order</div></div>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span class="af-cf-confidence high">High confidence</span>
+                <div class="af-cf-row-amount out">-£680.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: Pay Day ===== -->
+        <div class="af-tab-panel" id="panel-payday">
+          <div class="af-pd-hero">
+            <div class="af-pd-hero-content">
+              <div class="af-pd-countdown">23 days until payday · 5 March 2026</div>
+              <div class="af-pd-amount">£427</div>
+              <div class="af-pd-label">Predicted balance on payday</div>
+              <div class="af-pd-bar-track">
+                <div class="af-pd-bar-fill" style="width: 62%;"></div>
+              </div>
+              <div class="af-pd-bar-labels">
+                <span>Now: £2,135</span>
+                <span>Payday: £427</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="af-pd-breakdown">
+            <div class="af-pd-col">
+              <div class="af-pd-col-header committed">Committed Spending (remaining this month)</div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Barclaycard Payment (15 Feb)</span><span class="af-pd-line-amount">-£847.32</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Three Mobile (12 Feb)</span><span class="af-pd-line-amount">-£34.00</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Sky Broadband (18 Feb)</span><span class="af-pd-line-amount">-£43.00</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Admiral Car Insurance (22 Feb)</span><span class="af-pd-line-amount">-£48.60</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">HSBC Mortgage (1 Mar)</span><span class="af-pd-line-amount">-£942.00</span></div>
+              <div class="af-pd-total"><span>Total committed</span><span style="color: var(--af-red);">-£1,914.92</span></div>
+            </div>
+            <div class="af-pd-col">
+              <div class="af-pd-col-header discretionary">Estimated Discretionary</div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Groceries (est.)</span><span class="af-pd-line-amount">-£280.00</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Fuel (est.)</span><span class="af-pd-line-amount">-£110.00</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Dining &amp; takeaway (est.)</span><span class="af-pd-line-amount">-£65.00</span></div>
+              <div class="af-pd-line"><span class="af-pd-line-name">Other spending (est.)</span><span class="af-pd-line-amount">-£45.00</span></div>
+              <div class="af-pd-line" style="background: var(--af-green-50);">
+                <span class="af-pd-line-name" style="font-weight:600; color: var(--af-green-700);">Savings transfer (planned)</span>
+                <span class="af-pd-line-amount" style="color: var(--af-green-700);">-£200.00</span>
+              </div>
+              <div class="af-pd-total"><span>Total estimated</span><span>-£700.00</span></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </main>
   <div id="footer-placeholder"></div>
+
   <script>
-    async function loadComponent(id, file) {
-      try { const r = await fetch(file); if(r.ok) { document.getElementById(id).innerHTML = await r.text(); document.getElementById(id).querySelectorAll('script').forEach(o => { const s=document.createElement('script'); s.textContent=o.textContent; o.parentNode.replaceChild(s,o); }); }} catch(e){}
+    function switchTab(tabId) {
+      document.querySelectorAll('.af-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.af-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+      document.getElementById('panel-' + tabId).classList.add('active');
     }
-    loadComponent('header-placeholder','header.html');
-    loadComponent('footer-placeholder','footer.html');
+
+    function toggleAccordion(header) {
+      var item = header.closest('.af-acc-item');
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.af-acc-item').forEach(function(el) { el.classList.remove('open'); });
+      if (!wasOpen) { item.classList.add('open'); }
+    }
+
+    async function loadComponent(id, file) {
+      try {
+        var r = await fetch(file);
+        if (r.ok) {
+          document.getElementById(id).innerHTML = await r.text();
+          document.getElementById(id).querySelectorAll('script').forEach(function(o) {
+            var s = document.createElement('script');
+            s.textContent = o.textContent;
+            o.parentNode.replaceChild(s, o);
+          });
+        }
+      } catch(e) {}
+    }
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
   </script>
 </body>
 </html>

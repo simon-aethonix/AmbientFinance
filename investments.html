@@ -12,43 +12,110 @@
     .af-page-body { padding: 40px 0 80px; }
     .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
 
+    /* Summary */
     .af-inv-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
     .af-inv-stat {
       background: var(--af-white); border: 1px solid var(--af-sand-200);
       border-radius: var(--af-radius-lg); padding: 24px;
     }
     .af-inv-stat .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 8px; }
-    .af-inv-stat .value { font-family: var(--af-font-display); font-size: 24px; font-weight: 500; color: var(--af-slate-900); }
+    .af-inv-stat .value { font-family: var(--af-font-display); font-size: 26px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
     .af-inv-stat .sub { font-size: 13px; margin-top: 4px; }
     .af-inv-stat .sub.up { color: var(--af-green-600); }
-    .af-inv-stat .sub.down { color: var(--af-red); }
 
-    .af-inv-table {
+    /* Accordion */
+    .af-accordion { display: flex; flex-direction: column; gap: 12px; }
+    .af-acc-item {
       background: var(--af-white); border: 1px solid var(--af-sand-200);
-      border-radius: var(--af-radius-lg); overflow: hidden;
+      border-radius: var(--af-radius-lg); overflow: hidden; transition: all var(--af-transition);
     }
-    .af-inv-table table { width: 100%; border-collapse: collapse; }
-    .af-inv-table th {
-      text-align: left; padding: 14px 20px; font-size: 12px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400);
-      background: var(--af-sand-50); border-bottom: 1px solid var(--af-sand-200);
+    .af-acc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; cursor: pointer; transition: background var(--af-transition); user-select: none;
     }
-    .af-inv-table td {
-      padding: 16px 20px; font-size: 14px; color: var(--af-slate-700);
-      border-bottom: 1px solid var(--af-sand-100);
+    .af-acc-header:hover { background: var(--af-green-50); }
+    .af-acc-item.open .af-acc-header { background: var(--af-green-50); border-bottom: 1px solid var(--af-sand-200); }
+    .af-acc-left { display: flex; align-items: center; gap: 16px; }
+    .af-fund-icon {
+      width: 48px; height: 48px; border-radius: var(--af-radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
     }
-    .af-inv-table tr:last-child td { border-bottom: none; }
-    .af-inv-table tr:hover td { background: var(--af-sand-50); }
-    .af-inv-name { font-weight: 600; color: var(--af-slate-800); }
-    .af-inv-ticker { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; }
-    .gain { color: var(--af-green-600); font-weight: 500; }
-    .loss { color: var(--af-red); font-weight: 500; }
+    .af-fund-icon.global { background: var(--af-green-100); }
+    .af-fund-icon.world { background: #e8f0fe; }
+    .af-fund-icon.equity { background: #f3e5f5; }
+    .af-fund-icon.uk { background: #e0f7fa; }
+    .af-acc-name { font-weight: 600; color: var(--af-slate-800); font-size: 15px; }
+    .af-acc-detail { font-size: 13px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-acc-right { display: flex; align-items: center; gap: 20px; }
+    .af-inv-value {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em; text-align: right;
+    }
+    .af-inv-change { font-size: 13px; font-weight: 600; margin-top: 2px; text-align: right; }
+    .af-inv-change.up { color: var(--af-green-600); }
+    .af-inv-change.down { color: var(--af-red); }
+    .af-acc-chevron {
+      width: 20px; height: 20px; color: var(--af-slate-400);
+      transition: transform 0.3s ease; flex-shrink: 0;
+    }
+    .af-acc-item.open .af-acc-chevron { transform: rotate(180deg); }
+    .af-acc-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+    .af-acc-item.open .af-acc-body { max-height: 2000px; }
+    .af-acc-body-inner { padding: 0 28px 28px; }
 
-    @media (max-width: 900px) { .af-inv-summary { grid-template-columns: 1fr 1fr; } }
+    /* Detail grid */
+    .af-inv-details { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 16px; margin-bottom: 20px; }
+    .af-inv-detail-card {
+      background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 14px 16px;
+    }
+    .af-inv-detail-card .dlabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 4px; }
+    .af-inv-detail-card .dvalue { font-size: 16px; font-weight: 600; color: var(--af-slate-800); }
+    .af-inv-detail-card .dsub { font-size: 11px; color: var(--af-slate-400); margin-top: 2px; }
+
+    /* Holdings row */
+    .af-inv-holdings { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+    .af-inv-hold-card {
+      background: var(--af-green-50); border: 1px solid var(--af-green-200);
+      border-radius: var(--af-radius-md); padding: 14px 16px;
+    }
+    .af-inv-hold-card .dlabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-green-700); margin-bottom: 4px; }
+    .af-inv-hold-card .dvalue { font-size: 15px; font-weight: 600; color: var(--af-slate-800); }
+
+    /* Chart */
+    .af-inv-chart-wrap { margin-bottom: 16px; }
+    .af-inv-chart-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 10px; }
+    .af-inv-chart-period { display: flex; gap: 4px; margin-bottom: 12px; }
+    .af-inv-chart-btn {
+      padding: 4px 12px; font-size: 11px; font-weight: 600; font-family: var(--af-font-body);
+      border: 1px solid var(--af-sand-200); border-radius: 50px; background: var(--af-white);
+      color: var(--af-slate-500); cursor: pointer;
+    }
+    .af-inv-chart-btn.active { background: var(--af-green-50); border-color: var(--af-green-300); color: var(--af-green-700); }
+    .af-inv-chart {
+      width: 100%; height: 120px; background: var(--af-sand-50);
+      border-radius: var(--af-radius-md); overflow: hidden;
+    }
+    .af-inv-chart svg { width: 100%; height: 100%; }
+
+    /* Fund info row */
+    .af-fund-info {
+      display: flex; flex-wrap: wrap; gap: 24px; padding: 14px 0;
+      border-top: 1px solid var(--af-sand-100); font-size: 13px; color: var(--af-slate-500);
+    }
+    .af-fund-info strong { color: var(--af-slate-700); }
+
+    @media (max-width: 900px) {
+      .af-inv-summary { grid-template-columns: 1fr 1fr; }
+      .af-inv-details { grid-template-columns: 1fr 1fr; }
+      .af-inv-holdings { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 600px) {
       .af-inv-summary { grid-template-columns: 1fr; }
-      .af-inv-table { overflow-x: auto; }
-      .af-inv-table table { min-width: 600px; }
+      .af-inv-details { grid-template-columns: 1fr; }
+      .af-inv-holdings { grid-template-columns: 1fr; }
+      .af-acc-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .af-acc-right { width: 100%; justify-content: space-between; }
     }
   </style>
 </head>
@@ -56,10 +123,11 @@
   <div id="header-placeholder"></div>
   <main>
     <div class="af-page-header">
-      <div class="af-inner"><h1>Investments</h1><p>Track your portfolio performance across all accounts.</p></div>
+      <div class="af-inner"><h1>Investments</h1><p>Track your fund portfolio performance across all accounts.</p></div>
     </div>
     <div class="af-page-body">
       <div class="af-inner">
+
         <div class="af-inv-summary">
           <div class="af-inv-stat">
             <div class="label">Portfolio Value</div>
@@ -69,7 +137,7 @@
           <div class="af-inv-stat">
             <div class="label">Total Invested</div>
             <div class="value">£36,780</div>
-            <div class="sub" style="color: var(--af-slate-400);">Since Jan 2021</div>
+            <div class="sub" style="color:var(--af-slate-400);">Since Jan 2021</div>
           </div>
           <div class="af-inv-stat">
             <div class="label">Dividends (YTD)</div>
@@ -79,45 +147,253 @@
           <div class="af-inv-stat">
             <div class="label">ISA Allowance Left</div>
             <div class="value">£12,400</div>
-            <div class="sub" style="color: var(--af-slate-400);">of £20,000 (2024/25)</div>
+            <div class="sub" style="color:var(--af-slate-400);">of £20,000 (2024/25)</div>
           </div>
         </div>
 
-        <div class="af-inv-table">
-          <table>
-            <thead>
-              <tr><th>Holding</th><th>Shares</th><th>Avg. Cost</th><th>Current</th><th>Value</th><th>Gain/Loss</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><div class="af-inv-name">Vanguard FTSE Global All Cap</div><div class="af-inv-ticker">VAFTGAG · Fund</div></td>
-                <td>142.3</td><td>£128.40</td><td>£134.20</td><td>£19,098.66</td><td class="gain">+£825.54 (+4.5%)</td>
-              </tr>
-              <tr>
-                <td><div class="af-inv-name">iShares Core MSCI World</div><div class="af-inv-ticker">SWDA · ETF</div></td>
-                <td>85.0</td><td>£82.10</td><td>£86.40</td><td>£7,344.00</td><td class="gain">+£365.50 (+5.2%)</td>
-              </tr>
-              <tr>
-                <td><div class="af-inv-name">Fundsmith Equity</div><div class="af-inv-ticker">FEET · Fund</div></td>
-                <td>24.8</td><td>£254.00</td><td>£248.60</td><td>£6,165.28</td><td class="loss">-£133.92 (-2.1%)</td>
-              </tr>
-              <tr>
-                <td><div class="af-inv-name">Legal &amp; General UK Index</div><div class="af-inv-ticker">LGUKIA · Fund</div></td>
-                <td>1,840</td><td>£2.82</td><td>£3.04</td><td>£5,593.60</td><td class="gain">+£404.80 (+7.8%)</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="af-accordion">
+
+          <!-- Vanguard FTSE Global All Cap -->
+          <div class="af-acc-item">
+            <div class="af-acc-header" onclick="toggleAccordion(this)">
+              <div class="af-acc-left">
+                <div class="af-fund-icon global">🌍</div>
+                <div>
+                  <div class="af-acc-name">Vanguard FTSE Global All Cap Index</div>
+                  <div class="af-acc-detail">VAFTGAG · Accumulation · Vanguard</div>
+                </div>
+              </div>
+              <div class="af-acc-right">
+                <div>
+                  <div class="af-inv-value">£19,099</div>
+                  <div class="af-inv-change up">+£826 (+4.5%)</div>
+                </div>
+                <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="af-acc-body">
+              <div class="af-acc-body-inner">
+                <div class="af-inv-holdings">
+                  <div class="af-inv-hold-card"><div class="dlabel">Units Held</div><div class="dvalue">142.3</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Avg. Cost</div><div class="dvalue">£128.40</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Current Price</div><div class="dvalue">£134.20</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color:var(--af-green-700);">+£826</div></div>
+                </div>
+                <div class="af-inv-details">
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£141.60</div><div class="dsub">18 Dec 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£112.30</div><div class="dsub">5 Apr 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">YTD Performance</div><div class="dvalue" style="color:var(--af-green-700);">+5.8%</div><div class="dsub">From £126.84</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">Ongoing Charge</div><div class="dvalue">0.23%</div><div class="dsub">£44/yr at current value</div></div>
+                </div>
+                <div class="af-inv-chart-wrap">
+                  <div class="af-inv-chart-label">Performance (1 Year)</div>
+                  <div class="af-inv-chart-period"><button class="af-inv-chart-btn">1M</button><button class="af-inv-chart-btn">3M</button><button class="af-inv-chart-btn">6M</button><button class="af-inv-chart-btn active">1Y</button><button class="af-inv-chart-btn">3Y</button></div>
+                  <div class="af-inv-chart">
+                    <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                      <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                      <path d="M0,90 L25,85 L50,80 L75,82 L100,72 L125,68 L150,65 L175,60 L200,55 L225,52 L250,48 L275,45 L300,40 L325,38 L350,35 L375,32 L400,28" fill="url(#g1)" stroke="none"/>
+                      <path d="M0,90 L25,85 L50,80 L75,82 L100,72 L125,68 L150,65 L175,60 L200,55 L225,52 L250,48 L275,45 L300,40 L325,38 L350,35 L375,32 L400,28" fill="none" stroke="#22c55e" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="af-fund-info">
+                  <span><strong>Sector:</strong> Global All Cap</span>
+                  <span><strong>Holdings:</strong> 7,200+ companies</span>
+                  <span><strong>Top Region:</strong> US (62%)</span>
+                  <span><strong>Risk:</strong> Medium-High (5/7)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- iShares Core MSCI World -->
+          <div class="af-acc-item">
+            <div class="af-acc-header" onclick="toggleAccordion(this)">
+              <div class="af-acc-left">
+                <div class="af-fund-icon world">🌐</div>
+                <div>
+                  <div class="af-acc-name">iShares Core MSCI World ETF</div>
+                  <div class="af-acc-detail">SWDA · ETF · iShares</div>
+                </div>
+              </div>
+              <div class="af-acc-right">
+                <div>
+                  <div class="af-inv-value">£7,344</div>
+                  <div class="af-inv-change up">+£366 (+5.2%)</div>
+                </div>
+                <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="af-acc-body">
+              <div class="af-acc-body-inner">
+                <div class="af-inv-holdings">
+                  <div class="af-inv-hold-card"><div class="dlabel">Units Held</div><div class="dvalue">85.0</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Avg. Cost</div><div class="dvalue">£82.10</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Current Price</div><div class="dvalue">£86.40</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color:var(--af-green-700);">+£366</div></div>
+                </div>
+                <div class="af-inv-details">
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£92.14</div><div class="dsub">27 Dec 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£71.80</div><div class="dsub">14 Apr 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">YTD Performance</div><div class="dvalue" style="color:var(--af-green-700);">+4.2%</div><div class="dsub">From £82.92</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">Ongoing Charge</div><div class="dvalue">0.20%</div><div class="dsub">£15/yr at current value</div></div>
+                </div>
+                <div class="af-inv-chart-wrap">
+                  <div class="af-inv-chart-label">Performance (1 Year)</div>
+                  <div class="af-inv-chart-period"><button class="af-inv-chart-btn">1M</button><button class="af-inv-chart-btn">3M</button><button class="af-inv-chart-btn">6M</button><button class="af-inv-chart-btn active">1Y</button><button class="af-inv-chart-btn">3Y</button></div>
+                  <div class="af-inv-chart">
+                    <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                      <defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.12"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                      <path d="M0,88 L30,82 L60,78 L90,75 L120,70 L150,64 L180,62 L210,58 L240,52 L270,48 L300,44 L330,40 L360,36 L400,30" fill="url(#g2)" stroke="none"/>
+                      <path d="M0,88 L30,82 L60,78 L90,75 L120,70 L150,64 L180,62 L210,58 L240,52 L270,48 L300,44 L330,40 L360,36 L400,30" fill="none" stroke="#22c55e" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="af-fund-info">
+                  <span><strong>Sector:</strong> Developed World</span>
+                  <span><strong>Holdings:</strong> 1,500+ companies</span>
+                  <span><strong>Top Region:</strong> US (68%)</span>
+                  <span><strong>Risk:</strong> Medium-High (5/7)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fundsmith Equity -->
+          <div class="af-acc-item">
+            <div class="af-acc-header" onclick="toggleAccordion(this)">
+              <div class="af-acc-left">
+                <div class="af-fund-icon equity">📊</div>
+                <div>
+                  <div class="af-acc-name">Fundsmith Equity Fund</div>
+                  <div class="af-acc-detail">FEET · Fund · Fundsmith</div>
+                </div>
+              </div>
+              <div class="af-acc-right">
+                <div>
+                  <div class="af-inv-value">£6,165</div>
+                  <div class="af-inv-change down">-£134 (-2.1%)</div>
+                </div>
+                <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="af-acc-body">
+              <div class="af-acc-body-inner">
+                <div class="af-inv-holdings">
+                  <div class="af-inv-hold-card"><div class="dlabel">Units Held</div><div class="dvalue">24.8</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Avg. Cost</div><div class="dvalue">£254.00</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Current Price</div><div class="dvalue">£248.60</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color:var(--af-red);">-£134</div></div>
+                </div>
+                <div class="af-inv-details">
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£268.40</div><div class="dsub">8 Nov 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£232.10</div><div class="dsub">18 Jun 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">YTD Performance</div><div class="dvalue" style="color:var(--af-red);">-3.4%</div><div class="dsub">From £257.36</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">Ongoing Charge</div><div class="dvalue">1.05%</div><div class="dsub">£65/yr — above average</div></div>
+                </div>
+                <div class="af-inv-chart-wrap">
+                  <div class="af-inv-chart-label">Performance (1 Year)</div>
+                  <div class="af-inv-chart-period"><button class="af-inv-chart-btn">1M</button><button class="af-inv-chart-btn">3M</button><button class="af-inv-chart-btn">6M</button><button class="af-inv-chart-btn active">1Y</button><button class="af-inv-chart-btn">3Y</button></div>
+                  <div class="af-inv-chart">
+                    <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                      <defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.1"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0"/></linearGradient></defs>
+                      <path d="M0,40 L30,38 L60,35 L90,42 L120,45 L150,40 L180,48 L210,52 L240,55 L270,50 L300,58 L330,62 L360,58 L400,65" fill="url(#g3)" stroke="none"/>
+                      <path d="M0,40 L30,38 L60,35 L90,42 L120,45 L150,40 L180,48 L210,52 L240,55 L270,50 L300,58 L330,62 L360,58 L400,65" fill="none" stroke="#dc2626" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="af-fund-info">
+                  <span><strong>Sector:</strong> Global Equity</span>
+                  <span><strong>Holdings:</strong> 27 companies</span>
+                  <span><strong>Manager:</strong> Terry Smith</span>
+                  <span><strong>Risk:</strong> Medium-High (5/7)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- L&G UK Index -->
+          <div class="af-acc-item">
+            <div class="af-acc-header" onclick="toggleAccordion(this)">
+              <div class="af-acc-left">
+                <div class="af-fund-icon uk">🇬🇧</div>
+                <div>
+                  <div class="af-acc-name">Legal &amp; General UK Index Fund</div>
+                  <div class="af-acc-detail">LGUKIA · Fund · L&amp;G</div>
+                </div>
+              </div>
+              <div class="af-acc-right">
+                <div>
+                  <div class="af-inv-value">£5,594</div>
+                  <div class="af-inv-change up">+£405 (+7.8%)</div>
+                </div>
+                <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="af-acc-body">
+              <div class="af-acc-body-inner">
+                <div class="af-inv-holdings">
+                  <div class="af-inv-hold-card"><div class="dlabel">Units Held</div><div class="dvalue">1,840</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Avg. Cost</div><div class="dvalue">£2.82</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Current Price</div><div class="dvalue">£3.04</div></div>
+                  <div class="af-inv-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color:var(--af-green-700);">+£405</div></div>
+                </div>
+                <div class="af-inv-details">
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£3.18</div><div class="dsub">22 Jan 2026</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£2.54</div><div class="dsub">3 Mar 2025</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">YTD Performance</div><div class="dvalue" style="color:var(--af-green-700);">+6.3%</div><div class="dsub">From £2.86</div></div>
+                  <div class="af-inv-detail-card"><div class="dlabel">Ongoing Charge</div><div class="dvalue">0.10%</div><div class="dsub">£6/yr — excellent value</div></div>
+                </div>
+                <div class="af-inv-chart-wrap">
+                  <div class="af-inv-chart-label">Performance (1 Year)</div>
+                  <div class="af-inv-chart-period"><button class="af-inv-chart-btn">1M</button><button class="af-inv-chart-btn">3M</button><button class="af-inv-chart-btn">6M</button><button class="af-inv-chart-btn active">1Y</button><button class="af-inv-chart-btn">3Y</button></div>
+                  <div class="af-inv-chart">
+                    <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                      <defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                      <path d="M0,92 L30,88 L60,82 L90,78 L120,74 L150,70 L180,65 L210,58 L240,52 L270,48 L300,42 L330,38 L360,34 L400,25" fill="url(#g4)" stroke="none"/>
+                      <path d="M0,92 L30,88 L60,82 L90,78 L120,74 L150,70 L180,65 L210,58 L240,52 L270,48 L300,42 L330,38 L360,34 L400,25" fill="none" stroke="#22c55e" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="af-fund-info">
+                  <span><strong>Sector:</strong> UK All Companies</span>
+                  <span><strong>Holdings:</strong> 580+ companies</span>
+                  <span><strong>Tracks:</strong> FTSE All-Share</span>
+                  <span><strong>Risk:</strong> Medium (4/7)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </main>
   <div id="footer-placeholder"></div>
+
   <script>
-    async function loadComponent(id, file) {
-      try { const r = await fetch(file); if(r.ok) { document.getElementById(id).innerHTML = await r.text(); document.getElementById(id).querySelectorAll('script').forEach(o => { const s=document.createElement('script'); s.textContent=o.textContent; o.parentNode.replaceChild(s,o); }); }} catch(e){}
+    function toggleAccordion(header) {
+      var item = header.closest('.af-acc-item');
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.af-acc-item').forEach(function(el) { el.classList.remove('open'); });
+      if (!wasOpen) { item.classList.add('open'); }
     }
-    loadComponent('header-placeholder','header.html');
-    loadComponent('footer-placeholder','footer.html');
+
+    async function loadComponent(id, file) {
+      try {
+        var r = await fetch(file);
+        if (r.ok) {
+          document.getElementById(id).innerHTML = await r.text();
+          document.getElementById(id).querySelectorAll('script').forEach(function(o) {
+            var s = document.createElement('script');
+            s.textContent = o.textContent;
+            o.parentNode.replaceChild(s, o);
+          });
+        }
+      } catch(e) {}
+    }
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
   </script>
 </body>
 </html>

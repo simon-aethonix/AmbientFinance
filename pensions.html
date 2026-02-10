@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pensions — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header { padding: 48px 0 32px; border-bottom: 1px solid var(--af-sand-200); background: var(--af-white); }
+    .af-page-header h1 { font-family: var(--af-font-display); font-size: 32px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-page-header p { font-size: 16px; color: var(--af-slate-500); margin-top: 6px; }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
+
+    /* ---- Tabs ---- */
+    .af-tabs { display: flex; gap: 4px; margin-bottom: 32px; border-bottom: 2px solid var(--af-sand-200); }
+    .af-tab {
+      padding: 12px 24px; font-size: 14px; font-weight: 600; color: var(--af-slate-500);
+      cursor: pointer; border: none; background: none; font-family: var(--af-font-body);
+      transition: color var(--af-transition); margin-bottom: -2px; border-bottom: 2px solid transparent;
+    }
+    .af-tab:hover { color: var(--af-slate-800); }
+    .af-tab.active { color: var(--af-green-700); border-bottom-color: var(--af-green-700); }
+    .af-tab-panel { display: none; }
+    .af-tab-panel.active { display: block; }
+
+    /* ---- Summary Cards ---- */
+    .af-pen-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .af-pen-stat {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 24px;
+    }
+    .af-pen-stat .label {
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 8px;
+    }
+    .af-pen-stat .value {
+      font-family: var(--af-font-display); font-size: 26px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em;
+    }
+    .af-pen-stat .sub { font-size: 13px; margin-top: 4px; color: var(--af-slate-400); }
+    .af-pen-stat .sub.up { color: var(--af-green-600); }
+
+    /* ---- Accordion (reusing accounts pattern) ---- */
+    .af-accordion { display: flex; flex-direction: column; gap: 12px; }
+    .af-acc-item {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden; transition: all var(--af-transition);
+    }
+    .af-acc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; cursor: pointer; transition: background var(--af-transition); user-select: none;
+    }
+    .af-acc-header:hover { background: var(--af-green-50); }
+    .af-acc-item.open .af-acc-header { background: var(--af-green-50); border-bottom: 1px solid var(--af-sand-200); }
+    .af-acc-left { display: flex; align-items: center; gap: 16px; }
+    .af-acc-icon {
+      width: 48px; height: 48px; border-radius: var(--af-radius-md);
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .af-acc-icon.pension-active { background: var(--af-green-100); }
+    .af-acc-icon.pension-deferred { background: var(--af-sand-100); }
+    .af-acc-icon.pension-personal { background: #e8f0fe; }
+    .af-acc-name { font-weight: 600; color: var(--af-slate-800); font-size: 15px; }
+    .af-acc-detail { font-size: 13px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-acc-right { display: flex; align-items: center; gap: 16px; }
+    .af-acc-balance {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em; text-align: right;
+    }
+    .af-acc-meta { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; text-align: right; }
+    .af-acc-chevron {
+      width: 20px; height: 20px; color: var(--af-slate-400);
+      transition: transform 0.3s ease; flex-shrink: 0;
+    }
+    .af-acc-item.open .af-acc-chevron { transform: rotate(180deg); }
+    .af-acc-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+    .af-acc-item.open .af-acc-body { max-height: 3000px; }
+    .af-acc-body-inner { padding: 0 28px 28px; }
+
+    /* Pension detail grid inside accordion */
+    .af-pen-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; margin-bottom: 20px; }
+    .af-pen-detail-card {
+      background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 16px 20px;
+    }
+    .af-pen-detail-card .dlabel {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 4px;
+    }
+    .af-pen-detail-card .dvalue { font-size: 15px; font-weight: 600; color: var(--af-slate-800); }
+    .af-pen-detail-card .dsub { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; }
+
+    /* Fund allocation bar */
+    .af-fund-alloc { margin-top: 16px; margin-bottom: 20px; }
+    .af-fund-alloc-title {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 10px;
+    }
+    .af-fund-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; }
+    .af-fund-bar-seg { border-radius: 3px; }
+    .af-fund-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; }
+    .af-fund-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--af-slate-600); }
+    .af-fund-legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Risk indicator */
+    .af-risk { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .af-risk-label { font-size: 12px; font-weight: 600; color: var(--af-slate-400); text-transform: uppercase; letter-spacing: 0.06em; }
+    .af-risk-bar { display: flex; gap: 3px; }
+    .af-risk-seg { width: 18px; height: 6px; border-radius: 3px; background: var(--af-sand-200); }
+    .af-risk-seg.filled { background: var(--af-green-500); }
+    .af-risk-seg.filled.amber { background: var(--af-amber); }
+    .af-risk-seg.filled.red { background: var(--af-red); }
+    .af-risk-text { font-size: 12px; color: var(--af-slate-500); }
+
+    /* Transaction items */
+    .af-txn-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0 12px; border-bottom: 1px solid var(--af-sand-100);
+    }
+    .af-txn-header h4 {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400);
+    }
+    .af-txn-date-group {
+      font-size: 12px; font-weight: 600; color: var(--af-slate-400);
+      padding: 14px 0 6px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .af-txn {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--af-sand-50);
+    }
+    .af-txn:last-child { border-bottom: none; }
+    .af-txn-left { display: flex; align-items: center; gap: 12px; }
+    .af-txn-cat-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .af-txn-cat-icon.contribution { background: var(--af-green-100); }
+    .af-txn-cat-icon.employer { background: #e8f0fe; }
+    .af-txn-cat-icon.growth { background: #fff8e1; }
+    .af-txn-cat-icon.fee { background: #fce4ec; }
+    .af-txn-cat-icon.transfer-in { background: #e0f7fa; }
+    .af-txn-name { font-size: 14px; font-weight: 500; color: var(--af-slate-800); }
+    .af-txn-category { font-size: 11px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-txn-cat-tag {
+      padding: 1px 8px; border-radius: 50px; background: var(--af-sand-100);
+      font-size: 11px; color: var(--af-slate-500);
+    }
+    .af-txn-right { text-align: right; }
+    .af-txn-amount { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .af-txn-amount.credit { color: var(--af-green-700); }
+    .af-txn-amount.debit { color: var(--af-red); }
+    .af-txn-amount.neutral { color: var(--af-slate-600); }
+    .af-txn-balance { font-size: 11px; color: var(--af-slate-400); margin-top: 2px; }
+
+    /* Status badge */
+    .af-pen-status {
+      display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+      border-radius: 50px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .af-pen-status.active { background: var(--af-green-100); color: var(--af-green-800); }
+    .af-pen-status.deferred { background: var(--af-sand-200); color: var(--af-slate-600); }
+    .af-pen-status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .af-pen-status.active .af-pen-status-dot { background: var(--af-green-600); }
+    .af-pen-status.deferred .af-pen-status-dot { background: var(--af-slate-400); }
+
+    /* ===== Projection Tool ===== */
+    .af-proj {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-xl); overflow: hidden; margin-bottom: 28px;
+    }
+    .af-proj-header {
+      padding: 28px 32px 0; display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .af-proj-header h3 {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.01em;
+    }
+    .af-proj-header p { font-size: 14px; color: var(--af-slate-500); margin-top: 4px; }
+
+    .af-proj-body { padding: 28px 32px 32px; }
+
+    /* Retirement age slider */
+    .af-slider-group { margin-bottom: 28px; }
+    .af-slider-label {
+      display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;
+    }
+    .af-slider-label-text { font-size: 14px; font-weight: 600; color: var(--af-slate-700); }
+    .af-slider-value {
+      font-family: var(--af-font-display); font-size: 28px; font-weight: 500;
+      color: var(--af-green-700); letter-spacing: -0.02em;
+    }
+    .af-slider-track { position: relative; width: 100%; height: 44px; display: flex; align-items: center; }
+    .af-slider-input {
+      -webkit-appearance: none; appearance: none; width: 100%; height: 8px;
+      background: var(--af-sand-200); border-radius: 4px; outline: none;
+      cursor: pointer;
+    }
+    .af-slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 28px; height: 28px;
+      background: var(--af-green-600); border-radius: 50%; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(26,107,90,0.3);
+      transition: transform 0.15s ease;
+    }
+    .af-slider-input::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .af-slider-input::-moz-range-thumb {
+      width: 28px; height: 28px; background: var(--af-green-600);
+      border-radius: 50%; cursor: pointer; border: none;
+      box-shadow: 0 2px 8px rgba(26,107,90,0.3);
+    }
+    .af-slider-marks {
+      display: flex; justify-content: space-between; margin-top: 6px;
+      font-size: 11px; color: var(--af-slate-400);
+    }
+
+    /* Strategy buttons */
+    .af-strategy-group { margin-bottom: 28px; }
+    .af-strategy-label { font-size: 14px; font-weight: 600; color: var(--af-slate-700); margin-bottom: 12px; }
+    .af-strategy-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .af-strategy-btn {
+      padding: 10px 20px; font-size: 13px; font-weight: 600; font-family: var(--af-font-body);
+      border: 1.5px solid var(--af-sand-300); border-radius: var(--af-radius-sm);
+      background: var(--af-white); color: var(--af-slate-600); cursor: pointer;
+      transition: all var(--af-transition);
+    }
+    .af-strategy-btn:hover { border-color: var(--af-green-300); color: var(--af-green-700); }
+    .af-strategy-btn.active {
+      background: var(--af-green-50); border-color: var(--af-green-500);
+      color: var(--af-green-700);
+    }
+
+    /* Lump sum toggle */
+    .af-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid var(--af-sand-100); margin-bottom: 24px;
+    }
+    .af-toggle-text { font-size: 14px; font-weight: 500; color: var(--af-slate-700); }
+    .af-toggle-sub { font-size: 12px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-toggle {
+      position: relative; width: 48px; height: 26px; cursor: pointer;
+    }
+    .af-toggle input { opacity: 0; width: 0; height: 0; }
+    .af-toggle-track {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--af-sand-300); border-radius: 13px; transition: 0.2s;
+    }
+    .af-toggle-track::after {
+      content: ''; position: absolute; left: 3px; top: 3px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--af-white); box-shadow: var(--af-shadow-sm); transition: 0.2s;
+    }
+    .af-toggle input:checked + .af-toggle-track { background: var(--af-green-600); }
+    .af-toggle input:checked + .af-toggle-track::after { transform: translateX(22px); }
+
+    /* Projection results */
+    .af-proj-results {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      padding: 24px; background: var(--af-sand-50); border-radius: var(--af-radius-lg);
+      margin-bottom: 20px;
+    }
+    .af-proj-result { text-align: center; }
+    .af-proj-result .rlabel {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 6px;
+    }
+    .af-proj-result .rvalue {
+      font-family: var(--af-font-display); font-size: 30px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em;
+    }
+    .af-proj-result .rvalue.green { color: var(--af-green-700); }
+    .af-proj-result .rsub { font-size: 12px; color: var(--af-slate-400); margin-top: 4px; }
+
+    .af-proj-breakdown {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border: 1px solid var(--af-sand-200); border-radius: var(--af-radius-md); overflow: hidden;
+    }
+    .af-proj-bk-item {
+      padding: 16px 20px; border-bottom: 1px solid var(--af-sand-100);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .af-proj-bk-item:nth-child(odd) { border-right: 1px solid var(--af-sand-100); }
+    .af-proj-bk-item .bklabel { font-size: 13px; color: var(--af-slate-600); }
+    .af-proj-bk-item .bkvalue { font-size: 14px; font-weight: 600; color: var(--af-slate-800); font-variant-numeric: tabular-nums; }
+
+    .af-proj-disclaimer {
+      font-size: 12px; color: var(--af-slate-400); line-height: 1.6;
+      margin-top: 20px; padding: 16px; background: var(--af-sand-50);
+      border-radius: var(--af-radius-sm); border-left: 3px solid var(--af-sand-300);
+    }
+
+    /* ===== State Pension ===== */
+    .af-state-pension {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-xl); padding: 32px; margin-bottom: 28px;
+    }
+    .af-sp-header {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;
+    }
+    .af-sp-header h3 {
+      font-family: var(--af-font-display); font-size: 20px; font-weight: 500; color: var(--af-slate-900);
+    }
+    .af-sp-header p { font-size: 14px; color: var(--af-slate-500); margin-top: 4px; }
+    .af-sp-badge {
+      padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 600;
+      background: var(--af-green-100); color: var(--af-green-800);
+    }
+    .af-sp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+    .af-sp-card { background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 20px; }
+    .af-sp-card .splabel {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 6px;
+    }
+    .af-sp-card .spvalue {
+      font-family: var(--af-font-display); font-size: 24px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em;
+    }
+    .af-sp-card .spsub { font-size: 12px; color: var(--af-slate-400); margin-top: 4px; }
+
+    /* NI years progress */
+    .af-ni-progress { margin-top: 8px; }
+    .af-ni-bar-track {
+      height: 8px; background: var(--af-sand-200); border-radius: 4px; overflow: hidden; margin-bottom: 6px;
+    }
+    .af-ni-bar-fill {
+      height: 100%; border-radius: 4px; background: var(--af-green-500);
+    }
+    .af-ni-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--af-slate-400); }
+
+    /* ===== Milestones Timeline ===== */
+    .af-milestones {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-xl); padding: 32px;
+    }
+    .af-milestones h3 {
+      font-family: var(--af-font-display); font-size: 20px; font-weight: 500;
+      color: var(--af-slate-900); margin-bottom: 24px;
+    }
+    .af-milestone-list { position: relative; padding-left: 28px; }
+    .af-milestone-list::before {
+      content: ''; position: absolute; left: 8px; top: 6px; bottom: 6px;
+      width: 2px; background: var(--af-sand-200);
+    }
+    .af-milestone {
+      position: relative; padding: 0 0 28px 20px;
+    }
+    .af-milestone:last-child { padding-bottom: 0; }
+    .af-milestone-dot {
+      position: absolute; left: -24px; top: 4px;
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2.5px solid var(--af-sand-300); background: var(--af-white);
+    }
+    .af-milestone-dot.completed {
+      background: var(--af-green-500); border-color: var(--af-green-500);
+    }
+    .af-milestone-dot.current {
+      background: var(--af-white); border-color: var(--af-green-500);
+      box-shadow: 0 0 0 4px var(--af-green-100);
+    }
+    .af-milestone-age { font-size: 12px; font-weight: 700; color: var(--af-green-700); margin-bottom: 2px; }
+    .af-milestone-title { font-size: 15px; font-weight: 600; color: var(--af-slate-800); }
+    .af-milestone-desc { font-size: 13px; color: var(--af-slate-500); margin-top: 2px; line-height: 1.5; }
+    .af-milestone-tag {
+      display: inline-flex; margin-top: 6px; padding: 2px 8px; border-radius: 50px;
+      font-size: 11px; font-weight: 600;
+    }
+    .af-milestone-tag.past { background: var(--af-green-100); color: var(--af-green-800); }
+    .af-milestone-tag.now { background: #fff3e0; color: #e65100; }
+    .af-milestone-tag.future { background: var(--af-slate-100); color: var(--af-slate-500); }
+
+    /* ===== Annual Allowance ===== */
+    .af-allowance {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-xl); padding: 32px; margin-bottom: 28px;
+    }
+    .af-allowance h3 {
+      font-family: var(--af-font-display); font-size: 20px; font-weight: 500;
+      color: var(--af-slate-900); margin-bottom: 20px;
+    }
+    .af-allow-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .af-allow-card { background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 20px; }
+    .af-allow-card .alabel {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 6px;
+    }
+    .af-allow-card .avalue {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em;
+    }
+    .af-allow-card .asub { font-size: 12px; color: var(--af-slate-400); margin-top: 4px; }
+    .af-allow-bar-track {
+      height: 12px; background: var(--af-sand-200); border-radius: 6px;
+      overflow: hidden; margin-top: 20px; margin-bottom: 8px;
+    }
+    .af-allow-bar-fill { height: 100%; border-radius: 6px; background: var(--af-green-500); }
+    .af-allow-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--af-slate-400); }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 900px) {
+      .af-pen-summary { grid-template-columns: 1fr 1fr; }
+      .af-proj-results { grid-template-columns: 1fr; }
+      .af-proj-breakdown { grid-template-columns: 1fr; }
+      .af-proj-bk-item:nth-child(odd) { border-right: none; }
+      .af-sp-grid { grid-template-columns: 1fr; }
+      .af-allow-grid { grid-template-columns: 1fr; }
+      .af-pen-details { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .af-pen-summary { grid-template-columns: 1fr; }
+      .af-acc-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .af-acc-right { width: 100%; justify-content: space-between; }
+      .af-tabs { overflow-x: auto; }
+      .af-tab { white-space: nowrap; padding: 12px 16px; }
+      .af-strategy-btns { flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-page="pensions">
+  <div id="header-placeholder"></div>
+  <main>
+    <div class="af-page-header">
+      <div class="af-inner">
+        <h1>Pensions</h1>
+        <p>All your pension pots in one place — track, project, and plan your retirement.</p>
+      </div>
+    </div>
+    <div class="af-page-body">
+      <div class="af-inner">
+
+        <!-- Summary Cards -->
+        <div class="af-pen-summary">
+          <div class="af-pen-stat">
+            <div class="label">Combined Pension Pot</div>
+            <div class="value">£287,450</div>
+            <div class="sub up">↑ +£14,820 (5.4%) this year</div>
+          </div>
+          <div class="af-pen-stat">
+            <div class="label">Projected Annual Income</div>
+            <div class="value">£14,370</div>
+            <div class="sub">At age 67 (drawdown 4%)</div>
+          </div>
+          <div class="af-pen-stat">
+            <div class="label">Tax-Free Lump Sum</div>
+            <div class="value">£71,863</div>
+            <div class="sub">25% of combined pot</div>
+          </div>
+          <div class="af-pen-stat">
+            <div class="label">State Pension (est.)</div>
+            <div class="value">£11,502</div>
+            <div class="sub">Full new state pension</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="af-tabs">
+          <button class="af-tab active" data-tab="pots" onclick="switchTab('pots')">My Pension Pots</button>
+          <button class="af-tab" data-tab="projection" onclick="switchTab('projection')">Retirement Projection</button>
+          <button class="af-tab" data-tab="state" onclick="switchTab('state')">State Pension</button>
+          <button class="af-tab" data-tab="milestones" onclick="switchTab('milestones')">Milestones</button>
+        </div>
+
+        <!-- ===== TAB: My Pension Pots ===== -->
+        <div class="af-tab-panel active" id="panel-pots">
+
+          <!-- Annual Allowance -->
+          <div class="af-allowance">
+            <h3>Annual Allowance — 2025/26 Tax Year</h3>
+            <div class="af-allow-grid">
+              <div class="af-allow-card">
+                <div class="alabel">Annual Allowance</div>
+                <div class="avalue">£60,000</div>
+                <div class="asub">Standard allowance</div>
+              </div>
+              <div class="af-allow-card">
+                <div class="alabel">Contributions This Year</div>
+                <div class="avalue">£9,840</div>
+                <div class="asub">Employee + employer</div>
+              </div>
+              <div class="af-allow-card">
+                <div class="alabel">Remaining Allowance</div>
+                <div class="avalue" style="color: var(--af-green-700);">£50,160</div>
+                <div class="asub">Plus £18,200 carry forward</div>
+              </div>
+            </div>
+            <div class="af-allow-bar-track">
+              <div class="af-allow-bar-fill" style="width: 16.4%;"></div>
+            </div>
+            <div class="af-allow-labels">
+              <span>£9,840 used</span>
+              <span>£60,000 limit</span>
+            </div>
+          </div>
+
+          <div class="af-accordion">
+
+            <!-- Scottish Widows (Active) -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon pension-active">🏛️</div>
+                  <div>
+                    <div class="af-acc-name">Scottish Widows Workplace Pension <span class="af-pen-status active"><span class="af-pen-status-dot"></span> Active</span></div>
+                    <div class="af-acc-detail">ACME Engineering Ltd · Ref: SW-7749201</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance">£184,200</div>
+                    <div class="af-acc-meta">Updated today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+
+                  <!-- Pension Details Grid -->
+                  <div class="af-pen-details">
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Your Contribution</div>
+                      <div class="dvalue">5% (£223/month)</div>
+                      <div class="dsub">Via salary sacrifice</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Employer Contribution</div>
+                      <div class="dvalue">8% (£357/month)</div>
+                      <div class="dsub">Enhanced scheme</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Tax Relief Gained</div>
+                      <div class="dvalue">£1,394/yr</div>
+                      <div class="dsub">Via salary sacrifice</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Ongoing Charge</div>
+                      <div class="dvalue">0.32% p.a.</div>
+                      <div class="dsub">£589/yr at current value</div>
+                    </div>
+                  </div>
+
+                  <!-- Fund allocation -->
+                  <div class="af-fund-alloc">
+                    <div class="af-fund-alloc-title">Fund Allocation</div>
+                    <div class="af-fund-bar">
+                      <div class="af-fund-bar-seg" style="flex:45; background: var(--af-green-600);"></div>
+                      <div class="af-fund-bar-seg" style="flex:25; background: var(--af-blue);"></div>
+                      <div class="af-fund-bar-seg" style="flex:15; background: var(--af-amber);"></div>
+                      <div class="af-fund-bar-seg" style="flex:10; background: var(--af-slate-400);"></div>
+                      <div class="af-fund-bar-seg" style="flex:5; background: var(--af-green-300);"></div>
+                    </div>
+                    <div class="af-fund-legend">
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-green-600);"></div> Global Equity (45%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-blue);"></div> UK Equity (25%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-amber);"></div> Bonds (15%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-slate-400);"></div> Property (10%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-green-300);"></div> Cash (5%)</div>
+                    </div>
+                  </div>
+
+                  <!-- Risk level -->
+                  <div class="af-risk">
+                    <span class="af-risk-label">Risk Level</span>
+                    <div class="af-risk-bar">
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled amber"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                    </div>
+                    <span class="af-risk-text">Medium (4/7) — Balanced Growth</span>
+                  </div>
+
+                  <!-- Recent transactions -->
+                  <div class="af-txn-header" style="margin-top: 20px;">
+                    <h4>Recent Activity</h4>
+                    <span style="font-size:12px; color: var(--af-slate-400);">Last 3 months</span>
+                  </div>
+
+                  <div class="af-txn-date-group">5 Feb 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon contribution">💷</div>
+                      <div><div class="af-txn-name">Employee Contribution</div><div class="af-txn-category"><span class="af-txn-cat-tag">Your contribution</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£223.00</div><div class="af-txn-balance">Bal: £184,200</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon employer">🏢</div>
+                      <div><div class="af-txn-name">Employer Contribution — ACME Engineering</div><div class="af-txn-category"><span class="af-txn-cat-tag">Employer</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£357.00</div><div class="af-txn-balance">Bal: £183,977</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon fee">📋</div>
+                      <div><div class="af-txn-name">Platform &amp; Fund Charge</div><div class="af-txn-category"><span class="af-txn-cat-tag">Fee</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount debit">-£49.12</div><div class="af-txn-balance">Bal: £183,620</div></div>
+                  </div>
+
+                  <div class="af-txn-date-group">5 Jan 2026</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon contribution">💷</div>
+                      <div><div class="af-txn-name">Employee Contribution</div><div class="af-txn-category"><span class="af-txn-cat-tag">Your contribution</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£223.00</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon employer">🏢</div>
+                      <div><div class="af-txn-name">Employer Contribution — ACME Engineering</div><div class="af-txn-category"><span class="af-txn-cat-tag">Employer</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£357.00</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon growth">📈</div>
+                      <div><div class="af-txn-name">Fund Growth (Jan)</div><div class="af-txn-category"><span class="af-txn-cat-tag">Investment return</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£1,840.00</div></div>
+                  </div>
+
+                  <div class="af-txn-date-group">5 Dec 2025</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon contribution">💷</div>
+                      <div><div class="af-txn-name">Employee Contribution</div><div class="af-txn-category"><span class="af-txn-cat-tag">Your contribution</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£223.00</div></div>
+                  </div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon employer">🏢</div>
+                      <div><div class="af-txn-name">Employer Contribution — ACME Engineering</div><div class="af-txn-category"><span class="af-txn-cat-tag">Employer</span></div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£357.00</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- M&S Pension (Deferred) -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon pension-deferred">🏛️</div>
+                  <div>
+                    <div class="af-acc-name">M&amp;S Pension Scheme <span class="af-pen-status deferred"><span class="af-pen-status-dot"></span> Deferred</span></div>
+                    <div class="af-acc-detail">Marks &amp; Spencer plc · Ref: MS-PP-440182</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance">£62,400</div>
+                    <div class="af-acc-meta">Last valued: Oct 2025</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-pen-details">
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Scheme Type</div>
+                      <div class="dvalue">Defined Contribution</div>
+                      <div class="dsub">Money purchase</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Years of Service</div>
+                      <div class="dvalue">12 years</div>
+                      <div class="dsub">1998 – 2010</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Ongoing Charge</div>
+                      <div class="dvalue">0.45% p.a.</div>
+                      <div class="dsub">£281/yr at current value</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Default Fund</div>
+                      <div class="dvalue">M&amp;S Balanced Fund</div>
+                      <div class="dsub">Mixed assets — medium risk</div>
+                    </div>
+                  </div>
+
+                  <div class="af-fund-alloc">
+                    <div class="af-fund-alloc-title">Fund Allocation</div>
+                    <div class="af-fund-bar">
+                      <div class="af-fund-bar-seg" style="flex:35; background: var(--af-green-600);"></div>
+                      <div class="af-fund-bar-seg" style="flex:25; background: var(--af-blue);"></div>
+                      <div class="af-fund-bar-seg" style="flex:25; background: var(--af-amber);"></div>
+                      <div class="af-fund-bar-seg" style="flex:10; background: var(--af-slate-400);"></div>
+                      <div class="af-fund-bar-seg" style="flex:5; background: var(--af-green-300);"></div>
+                    </div>
+                    <div class="af-fund-legend">
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-green-600);"></div> Global Equity (35%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-blue);"></div> UK Equity (25%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-amber);"></div> Bonds (25%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-slate-400);"></div> Property (10%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-green-300);"></div> Cash (5%)</div>
+                    </div>
+                  </div>
+
+                  <div class="af-risk">
+                    <span class="af-risk-label">Risk Level</span>
+                    <div class="af-risk-bar">
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                    </div>
+                    <span class="af-risk-text">Low-Medium (3/7) — Balanced</span>
+                  </div>
+
+                  <div class="af-txn-header" style="margin-top: 20px;">
+                    <h4>Historic Activity</h4>
+                    <span style="font-size:12px; color: var(--af-slate-400);">No active contributions</span>
+                  </div>
+                  <div class="af-txn-date-group">Oct 2025 — Annual Statement</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon growth">📈</div>
+                      <div><div class="af-txn-name">Fund Growth (2024/25)</div><div class="af-txn-category"><span class="af-txn-cat-tag">Annual return</span> · +6.2%</div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£3,640</div></div>
+                  </div>
+                  <div class="af-txn-date-group">Mar 2010 — Final Contribution</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon contribution">💷</div>
+                      <div><div class="af-txn-name">Final Employee &amp; Employer Contribution</div><div class="af-txn-category"><span class="af-txn-cat-tag">Last contribution</span> · Employment ended</div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount neutral">£420.00</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Aviva (Deferred) -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-acc-icon pension-personal">🏛️</div>
+                  <div>
+                    <div class="af-acc-name">Aviva Personal Pension <span class="af-pen-status deferred"><span class="af-pen-status-dot"></span> Deferred</span></div>
+                    <div class="af-acc-detail">Personal pension · Ref: AVP-2281940</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-acc-balance">£40,850</div>
+                    <div class="af-acc-meta">Last valued: Sep 2025</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-pen-details">
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Scheme Type</div>
+                      <div class="dvalue">Personal Pension</div>
+                      <div class="dsub">Stakeholder plan</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Contribution Period</div>
+                      <div class="dvalue">8 years</div>
+                      <div class="dsub">1990 – 1998</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Ongoing Charge</div>
+                      <div class="dvalue">0.75% p.a.</div>
+                      <div class="dsub">£306/yr — consider consolidating</div>
+                    </div>
+                    <div class="af-pen-detail-card">
+                      <div class="dlabel">Default Fund</div>
+                      <div class="dvalue">Aviva Mixed Investment 40-85</div>
+                      <div class="dsub">Multi-asset</div>
+                    </div>
+                  </div>
+
+                  <div class="af-fund-alloc">
+                    <div class="af-fund-alloc-title">Fund Allocation</div>
+                    <div class="af-fund-bar">
+                      <div class="af-fund-bar-seg" style="flex:40; background: var(--af-green-600);"></div>
+                      <div class="af-fund-bar-seg" style="flex:20; background: var(--af-blue);"></div>
+                      <div class="af-fund-bar-seg" style="flex:30; background: var(--af-amber);"></div>
+                      <div class="af-fund-bar-seg" style="flex:10; background: var(--af-green-300);"></div>
+                    </div>
+                    <div class="af-fund-legend">
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-green-600);"></div> Global Equity (40%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-blue);"></div> UK Equity (20%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-amber);"></div> Bonds (30%)</div>
+                      <div class="af-fund-legend-item"><div class="af-fund-legend-dot" style="background: var(--af-green-300);"></div> Cash (10%)</div>
+                    </div>
+                  </div>
+
+                  <div class="af-risk">
+                    <span class="af-risk-label">Risk Level</span>
+                    <div class="af-risk-bar">
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg filled"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                      <div class="af-risk-seg"></div>
+                    </div>
+                    <span class="af-risk-text">Low-Medium (3/7) — Cautious Growth</span>
+                  </div>
+
+                  <div style="margin-top: 16px; padding: 14px 18px; background: #fff3e0; border-radius: var(--af-radius-sm); border-left: 3px solid var(--af-amber); font-size: 13px; color: #92640d;">
+                    <strong>💡 Tip:</strong> This pension has a higher ongoing charge (0.75%) than your other pots. Consolidating into your Scottish Widows scheme could save approximately £170/year in fees. <a href="#" onclick="return false;" style="color: var(--af-green-700); text-decoration: underline;">Learn more about pension transfers →</a>
+                  </div>
+
+                  <div class="af-txn-header" style="margin-top: 20px;">
+                    <h4>Historic Activity</h4>
+                    <span style="font-size:12px; color: var(--af-slate-400);">No active contributions</span>
+                  </div>
+                  <div class="af-txn-date-group">Sep 2025 — Annual Statement</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon growth">📈</div>
+                      <div><div class="af-txn-name">Fund Growth (2024/25)</div><div class="af-txn-category"><span class="af-txn-cat-tag">Annual return</span> · +4.8%</div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount credit">+£1,870</div></div>
+                  </div>
+                  <div class="af-txn-date-group">Jun 1998 — Final Contribution</div>
+                  <div class="af-txn">
+                    <div class="af-txn-left">
+                      <div class="af-txn-cat-icon contribution">💷</div>
+                      <div><div class="af-txn-name">Final Monthly Contribution</div><div class="af-txn-category"><span class="af-txn-cat-tag">Last contribution</span> · Ceased payments</div></div>
+                    </div>
+                    <div class="af-txn-right"><div class="af-txn-amount neutral">£150.00</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ===== TAB: Retirement Projection ===== -->
+        <div class="af-tab-panel" id="panel-projection">
+          <div class="af-proj">
+            <div class="af-proj-header">
+              <div>
+                <h3>Retirement Income Projection</h3>
+                <p>Estimate your annual retirement income based on your pension pots and preferences.</p>
+              </div>
+            </div>
+            <div class="af-proj-body">
+
+              <!-- Retirement age slider -->
+              <div class="af-slider-group">
+                <div class="af-slider-label">
+                  <span class="af-slider-label-text">Retirement Age</span>
+                  <span class="af-slider-value" id="age-display">67</span>
+                </div>
+                <div class="af-slider-track">
+                  <input type="range" min="55" max="75" value="67" class="af-slider-input" id="age-slider" oninput="updateProjection()">
+                </div>
+                <div class="af-slider-marks">
+                  <span>55 (earliest)</span>
+                  <span>60</span>
+                  <span>67 (state pension)</span>
+                  <span>75</span>
+                </div>
+              </div>
+
+              <!-- Drawdown strategy -->
+              <div class="af-strategy-group">
+                <div class="af-strategy-label">Drawdown Strategy</div>
+                <div class="af-strategy-btns">
+                  <button class="af-strategy-btn" data-rate="0.03" onclick="setStrategy(this, 0.03)">Cautious (3%)<br><span style="font-weight:400; font-size:11px;">Lower income, pot lasts longer</span></button>
+                  <button class="af-strategy-btn active" data-rate="0.04" onclick="setStrategy(this, 0.04)">Moderate (4%)<br><span style="font-weight:400; font-size:11px;">Balanced approach</span></button>
+                  <button class="af-strategy-btn" data-rate="0.05" onclick="setStrategy(this, 0.05)">Comfortable (5%)<br><span style="font-weight:400; font-size:11px;">Higher income, more risk</span></button>
+                  <button class="af-strategy-btn" data-rate="0" onclick="setStrategy(this, 0)">Annuity<br><span style="font-weight:400; font-size:11px;">Guaranteed income for life</span></button>
+                </div>
+              </div>
+
+              <!-- Lump sum toggle -->
+              <div class="af-toggle-row">
+                <div>
+                  <div class="af-toggle-text">Take 25% tax-free lump sum</div>
+                  <div class="af-toggle-sub">Reduces your pot but gives a tax-free cash payment at retirement</div>
+                </div>
+                <label class="af-toggle">
+                  <input type="checkbox" id="lump-toggle" checked onchange="updateProjection()">
+                  <span class="af-toggle-track"></span>
+                </label>
+              </div>
+
+              <!-- Results -->
+              <div class="af-proj-results" id="proj-results">
+                <div class="af-proj-result">
+                  <div class="rlabel">Projected Pot at Retirement</div>
+                  <div class="rvalue" id="proj-pot">£339,650</div>
+                  <div class="rsub" id="proj-pot-sub">7 years of growth at 5% p.a.</div>
+                </div>
+                <div class="af-proj-result">
+                  <div class="rlabel">Estimated Annual Income</div>
+                  <div class="rvalue green" id="proj-income">£10,189</div>
+                  <div class="rsub" id="proj-income-sub">From private pensions (4% drawdown)</div>
+                </div>
+                <div class="af-proj-result">
+                  <div class="rlabel">Total with State Pension</div>
+                  <div class="rvalue green" id="proj-total">£21,691</div>
+                  <div class="rsub">£1,807/month combined</div>
+                </div>
+              </div>
+
+              <div class="af-proj-breakdown" id="proj-breakdown">
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Current combined pot</span>
+                  <span class="bkvalue">£287,450</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Future contributions (est.)</span>
+                  <span class="bkvalue" id="bk-contributions">£48,720</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Projected growth</span>
+                  <span class="bkvalue" id="bk-growth">£51,200</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Projected pot at retirement</span>
+                  <span class="bkvalue" id="bk-pot">£339,650</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Tax-free lump sum (25%)</span>
+                  <span class="bkvalue" id="bk-lumpsum">£84,913</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Remaining pot for income</span>
+                  <span class="bkvalue" id="bk-remaining">£254,738</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">Annual drawdown income</span>
+                  <span class="bkvalue" id="bk-drawdown">£10,189</span>
+                </div>
+                <div class="af-proj-bk-item">
+                  <span class="bklabel">State pension (from age 67)</span>
+                  <span class="bkvalue" id="bk-state">£11,502</span>
+                </div>
+              </div>
+
+              <div class="af-proj-disclaimer">
+                <strong>Important:</strong> These projections are for illustrative purposes only and are not financial advice. They assume a nominal annual growth rate of 5% before charges, ongoing contributions at current levels, and that the state pension age and entitlements remain unchanged. Actual returns may be higher or lower. Inflation will reduce the purchasing power of future income. You should consider taking independent financial advice before making any pension decisions.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: State Pension ===== -->
+        <div class="af-tab-panel" id="panel-state">
+          <div class="af-state-pension">
+            <div class="af-sp-header">
+              <div>
+                <h3>State Pension Forecast</h3>
+                <p>Based on your National Insurance record as of April 2025.</p>
+              </div>
+              <span class="af-sp-badge">Full entitlement</span>
+            </div>
+            <div class="af-sp-grid">
+              <div class="af-sp-card">
+                <div class="splabel">Weekly Amount</div>
+                <div class="spvalue">£221.20</div>
+                <div class="spsub">Full new state pension (2025/26)</div>
+              </div>
+              <div class="af-sp-card">
+                <div class="splabel">Annual Amount</div>
+                <div class="spvalue">£11,502</div>
+                <div class="spsub">Paid every 4 weeks</div>
+              </div>
+              <div class="af-sp-card">
+                <div class="splabel">State Pension Age</div>
+                <div class="spvalue">67</div>
+                <div class="spsub">Payable from 2033</div>
+              </div>
+            </div>
+
+            <h4 style="font-size: 15px; font-weight: 600; color: var(--af-slate-700); margin-bottom: 12px; margin-top: 8px;">National Insurance Record</h4>
+            <div class="af-sp-grid">
+              <div class="af-sp-card">
+                <div class="splabel">Qualifying Years</div>
+                <div class="spvalue">38</div>
+                <div class="spsub">35 needed for full pension</div>
+                <div class="af-ni-progress">
+                  <div class="af-ni-bar-track"><div class="af-ni-bar-fill" style="width: 100%;"></div></div>
+                  <div class="af-ni-labels"><span>38 of 35 years</span><span>Full ✓</span></div>
+                </div>
+              </div>
+              <div class="af-sp-card">
+                <div class="splabel">Years to State Pension</div>
+                <div class="spvalue">7 years</div>
+                <div class="spsub">Reachable: 2033</div>
+              </div>
+              <div class="af-sp-card">
+                <div class="splabel">Deferral Bonus</div>
+                <div class="spvalue">+£1,058/yr</div>
+                <div class="spsub">If deferred 1 year to age 68</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 16px 20px; background: var(--af-green-50); border-radius: var(--af-radius-sm); border-left: 3px solid var(--af-green-500); font-size: 13px; color: var(--af-green-800);">
+              <strong>✓ Good news:</strong> You have more than the 35 qualifying years needed for the full new state pension. No further NI contributions are required to maintain your full entitlement. You may choose to defer your state pension for a higher weekly amount — each year of deferral adds approximately 5.8%.
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAB: Milestones ===== -->
+        <div class="af-tab-panel" id="panel-milestones">
+          <div class="af-milestones">
+            <h3>Your Pension Timeline</h3>
+            <div class="af-milestone-list">
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot completed"></div>
+                <div class="af-milestone-age">Age 22 (1988)</div>
+                <div class="af-milestone-title">Started Aviva Personal Pension</div>
+                <div class="af-milestone-desc">Opened a personal pension and began contributing £150/month. This was before auto-enrolment existed — good forward thinking.</div>
+                <span class="af-milestone-tag past">Completed</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot completed"></div>
+                <div class="af-milestone-age">Age 32 (1998)</div>
+                <div class="af-milestone-title">Joined M&amp;S Pension Scheme</div>
+                <div class="af-milestone-desc">Enrolled in the M&amp;S workplace pension scheme. Employer contributed 6% with your 4% contribution.</div>
+                <span class="af-milestone-tag past">Completed</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot completed"></div>
+                <div class="af-milestone-age">Age 44 (2010)</div>
+                <div class="af-milestone-title">Left M&amp;S — Pension Deferred</div>
+                <div class="af-milestone-desc">Moved to ACME Engineering. M&amp;S pension remained invested as a deferred member. Pot was £31,200 at the time.</div>
+                <span class="af-milestone-tag past">Completed</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot completed"></div>
+                <div class="af-milestone-age">Age 44 (2010)</div>
+                <div class="af-milestone-title">Joined Scottish Widows Workplace Pension</div>
+                <div class="af-milestone-desc">Auto-enrolled via ACME Engineering with enhanced employer contribution of 8%. Currently your largest pot.</div>
+                <span class="af-milestone-tag past">Completed</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot current"></div>
+                <div class="af-milestone-age">Age 60 (Now — 2026)</div>
+                <div class="af-milestone-title">Current Position</div>
+                <div class="af-milestone-desc">Combined pension pot of £287,450 across 3 providers. Active contributions via Scottish Widows at £580/month (employee + employer). Projected retirement income of £21,691/year including state pension.</div>
+                <span class="af-milestone-tag now">You are here</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot"></div>
+                <div class="af-milestone-age">Age 55 – 60</div>
+                <div class="af-milestone-title">Pension Freedoms Available Now</div>
+                <div class="af-milestone-desc">Since age 55, you can access your DC pensions flexibly: take 25% tax-free, enter drawdown, or purchase an annuity. No action required — but options are open if circumstances change.</div>
+                <span class="af-milestone-tag future">Available now</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot"></div>
+                <div class="af-milestone-age">Age 67 (2033)</div>
+                <div class="af-milestone-title">State Pension Age</div>
+                <div class="af-milestone-desc">Eligible for the full new state pension of £11,502/year. At this point your combined projected income (private + state) is approximately £21,691/year. You can defer for a 5.8% annual increase.</div>
+                <span class="af-milestone-tag future">7 years away</span>
+              </div>
+
+              <div class="af-milestone">
+                <div class="af-milestone-dot"></div>
+                <div class="af-milestone-age">Age 75</div>
+                <div class="af-milestone-title">Pension Tax Rules Change</div>
+                <div class="af-milestone-desc">From age 75, if you die with remaining pension funds, beneficiaries may pay income tax on inherited drawdown funds. Worth reviewing your expression of wish and estate planning before this point.</div>
+                <span class="af-milestone-tag future">15 years away</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+
+  <script>
+    /* ---- Tabs ---- */
+    function switchTab(tabId) {
+      document.querySelectorAll('.af-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.af-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+      document.getElementById('panel-' + tabId).classList.add('active');
+    }
+
+    /* ---- Accordion ---- */
+    function toggleAccordion(header) {
+      var item = header.closest('.af-acc-item');
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.af-acc-item').forEach(function(el) { el.classList.remove('open'); });
+      if (!wasOpen) { item.classList.add('open'); }
+    }
+
+    /* ---- Projection Calculator ---- */
+    var currentRate = 0.04;
+    var currentPot = 287450;
+    var monthlyContrib = 580;
+    var growthRate = 0.05;
+    var statePension = 11502;
+    var annuityRate = 0.052; // approximate annuity rate for age 67
+
+    function setStrategy(btn, rate) {
+      document.querySelectorAll('.af-strategy-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentRate = rate;
+      updateProjection();
+    }
+
+    function updateProjection() {
+      var retireAge = parseInt(document.getElementById('age-slider').value);
+      var takeLump = document.getElementById('lump-toggle').checked;
+      var yearsToRetire = retireAge - 60;
+
+      document.getElementById('age-display').textContent = retireAge;
+
+      // Future value calculation
+      var futureContributions = monthlyContrib * 12 * yearsToRetire;
+      var pot = currentPot;
+      for (var i = 0; i < yearsToRetire; i++) {
+        pot = (pot + monthlyContrib * 12) * (1 + growthRate);
+      }
+      var projectedGrowth = pot - currentPot - futureContributions;
+
+      var lumpSum = takeLump ? pot * 0.25 : 0;
+      var remainingPot = pot - lumpSum;
+
+      // Income calculation
+      var annualIncome;
+      var incomeLabel;
+      if (currentRate === 0) {
+        // Annuity
+        annualIncome = remainingPot * annuityRate;
+        incomeLabel = 'From private pensions (annuity)';
+      } else {
+        annualIncome = remainingPot * currentRate;
+        incomeLabel = 'From private pensions (' + (currentRate * 100) + '% drawdown)';
+      }
+
+      // State pension only from age 67
+      var stateAmount = retireAge >= 67 ? statePension : 0;
+      if (retireAge < 67) {
+        stateAmount = 0;
+      }
+      var totalIncome = annualIncome + stateAmount;
+
+      // Update display
+      document.getElementById('proj-pot').textContent = '£' + formatNum(Math.round(pot));
+      document.getElementById('proj-pot-sub').textContent = yearsToRetire + ' years of growth at 5% p.a.';
+      document.getElementById('proj-income').textContent = '£' + formatNum(Math.round(annualIncome));
+      document.getElementById('proj-income-sub').textContent = incomeLabel;
+      document.getElementById('proj-total').textContent = '£' + formatNum(Math.round(totalIncome));
+
+      document.getElementById('bk-contributions').textContent = '£' + formatNum(Math.round(futureContributions));
+      document.getElementById('bk-growth').textContent = '£' + formatNum(Math.round(projectedGrowth));
+      document.getElementById('bk-pot').textContent = '£' + formatNum(Math.round(pot));
+      document.getElementById('bk-lumpsum').textContent = takeLump ? '£' + formatNum(Math.round(lumpSum)) : '—';
+      document.getElementById('bk-remaining').textContent = '£' + formatNum(Math.round(remainingPot));
+      document.getElementById('bk-drawdown').textContent = '£' + formatNum(Math.round(annualIncome));
+      document.getElementById('bk-state').textContent = stateAmount > 0 ? '£' + formatNum(stateAmount) : 'Not yet (age 67)';
+    }
+
+    function formatNum(n) {
+      return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    // Initialize
+    updateProjection();
+
+    /* ---- Load header/footer ---- */
+    async function loadComponent(id, file) {
+      try {
+        var r = await fetch(file);
+        if (r.ok) {
+          document.getElementById(id).innerHTML = await r.text();
+          document.getElementById(id).querySelectorAll('script').forEach(function(o) {
+            var s = document.createElement('script');
+            s.textContent = o.textContent;
+            o.parentNode.replaceChild(s, o);
+          });
+        }
+      } catch(e) {}
+    }
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
+  </script>
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shares — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header { padding: 48px 0 32px; border-bottom: 1px solid var(--af-sand-200); background: var(--af-white); }
+    .af-page-header h1 { font-family: var(--af-font-display); font-size: 32px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-page-header p { font-size: 16px; color: var(--af-slate-500); margin-top: 6px; }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
+
+    /* Summary strip */
+    .af-sh-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+    .af-sh-stat {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 24px;
+    }
+    .af-sh-stat .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 8px; }
+    .af-sh-stat .value { font-family: var(--af-font-display); font-size: 26px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-sh-stat .sub { font-size: 13px; margin-top: 4px; }
+    .af-sh-stat .sub.up { color: var(--af-green-600); }
+    .af-sh-stat .sub.down { color: var(--af-red); }
+
+    /* ---- PR Crisis Alerts ---- */
+    .af-alerts { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .af-alert-card {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 18px 24px; border-radius: var(--af-radius-lg);
+      border: 1.5px solid; animation: alertPulse 3s ease-in-out infinite;
+    }
+    @keyframes alertPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(212,64,64,0); }
+      50% { box-shadow: 0 0 0 4px rgba(212,64,64,0.08); }
+    }
+    .af-alert-card.critical { background: #fef2f2; border-color: #fca5a5; }
+    .af-alert-card.warning { background: #fffbeb; border-color: #fcd34d; }
+    .af-alert-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+    .af-alert-body { flex: 1; }
+    .af-alert-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px;
+      border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px;
+    }
+    .af-alert-badge.critical-badge { background: #dc2626; color: white; }
+    .af-alert-badge.warning-badge { background: #d97706; color: white; }
+    .af-alert-title { font-size: 15px; font-weight: 600; color: var(--af-slate-900); margin-bottom: 4px; }
+    .af-alert-desc { font-size: 13px; color: var(--af-slate-600); line-height: 1.55; }
+    .af-alert-meta { display: flex; align-items: center; gap: 16px; margin-top: 8px; font-size: 12px; color: var(--af-slate-400); }
+    .af-alert-metric { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600; }
+    .af-alert-metric.neg { background: #fee2e2; color: #dc2626; }
+    .af-alert-metric.spike { background: #fef3c7; color: #d97706; }
+    .af-alert-dismiss {
+      padding: 6px 14px; border: 1px solid var(--af-sand-300); border-radius: var(--af-radius-sm);
+      background: var(--af-white); font-size: 12px; font-weight: 600; color: var(--af-slate-500);
+      cursor: pointer; flex-shrink: 0; align-self: center; font-family: var(--af-font-body);
+    }
+
+    /* ---- Tabs ---- */
+    .af-tabs { display: flex; gap: 4px; margin-bottom: 32px; border-bottom: 2px solid var(--af-sand-200); }
+    .af-tab {
+      padding: 12px 24px; font-size: 14px; font-weight: 600; color: var(--af-slate-500);
+      cursor: pointer; border: none; background: none; font-family: var(--af-font-body);
+      transition: color var(--af-transition); margin-bottom: -2px; border-bottom: 2px solid transparent;
+    }
+    .af-tab:hover { color: var(--af-slate-800); }
+    .af-tab.active { color: var(--af-green-700); border-bottom-color: var(--af-green-700); }
+    .af-tab-panel { display: none; }
+    .af-tab-panel.active { display: block; }
+
+    /* ---- Accordion ---- */
+    .af-accordion { display: flex; flex-direction: column; gap: 12px; }
+    .af-acc-item {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden; transition: all var(--af-transition);
+    }
+    .af-acc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; cursor: pointer; transition: background var(--af-transition); user-select: none;
+    }
+    .af-acc-header:hover { background: var(--af-green-50); }
+    .af-acc-item.open .af-acc-header { background: var(--af-green-50); border-bottom: 1px solid var(--af-sand-200); }
+    .af-acc-left { display: flex; align-items: center; gap: 16px; }
+    .af-sh-ticker {
+      width: 48px; height: 48px; border-radius: var(--af-radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.02em; flex-shrink: 0;
+      color: var(--af-white);
+    }
+    .af-acc-name { font-weight: 600; color: var(--af-slate-800); font-size: 15px; }
+    .af-acc-detail { font-size: 13px; color: var(--af-slate-400); margin-top: 2px; }
+    .af-acc-right { display: flex; align-items: center; gap: 20px; }
+    .af-sh-price {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 500;
+      color: var(--af-slate-900); letter-spacing: -0.02em; text-align: right;
+    }
+    .af-sh-change { font-size: 13px; font-weight: 600; margin-top: 2px; text-align: right; }
+    .af-sh-change.up { color: var(--af-green-600); }
+    .af-sh-change.down { color: var(--af-red); }
+    .af-acc-chevron {
+      width: 20px; height: 20px; color: var(--af-slate-400);
+      transition: transform 0.3s ease; flex-shrink: 0;
+    }
+    .af-acc-item.open .af-acc-chevron { transform: rotate(180deg); }
+    .af-acc-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+    .af-acc-item.open .af-acc-body { max-height: 3000px; }
+    .af-acc-body-inner { padding: 0 28px 28px; }
+
+    /* Share detail grid */
+    .af-sh-details { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 16px; margin-bottom: 20px; }
+    .af-sh-detail-card {
+      background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 14px 16px;
+    }
+    .af-sh-detail-card .dlabel {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 4px;
+    }
+    .af-sh-detail-card .dvalue { font-size: 16px; font-weight: 600; color: var(--af-slate-800); }
+    .af-sh-detail-card .dsub { font-size: 11px; color: var(--af-slate-400); margin-top: 2px; }
+
+    /* Holdings info */
+    .af-sh-holdings { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+    .af-sh-hold-card {
+      background: var(--af-green-50); border: 1px solid var(--af-green-200);
+      border-radius: var(--af-radius-md); padding: 14px 16px;
+    }
+    .af-sh-hold-card .dlabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--af-green-700); margin-bottom: 4px; }
+    .af-sh-hold-card .dvalue { font-size: 16px; font-weight: 600; color: var(--af-slate-800); }
+
+    /* Mini chart */
+    .af-sh-chart-wrap { margin-bottom: 20px; }
+    .af-sh-chart-label {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 10px;
+    }
+    .af-sh-chart-period { display: flex; gap: 4px; margin-bottom: 12px; }
+    .af-sh-chart-btn {
+      padding: 4px 12px; font-size: 11px; font-weight: 600; font-family: var(--af-font-body);
+      border: 1px solid var(--af-sand-200); border-radius: 50px; background: var(--af-white);
+      color: var(--af-slate-500); cursor: pointer;
+    }
+    .af-sh-chart-btn.active { background: var(--af-green-50); border-color: var(--af-green-300); color: var(--af-green-700); }
+    .af-sh-chart {
+      width: 100%; height: 120px; background: var(--af-sand-50);
+      border-radius: var(--af-radius-md); overflow: hidden;
+    }
+    .af-sh-chart svg { width: 100%; height: 100%; }
+
+    /* ---- Sentiment Section ---- */
+    .af-sent { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--af-sand-100); }
+    .af-sent-title {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--af-slate-400); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .af-sent-title .ai-badge {
+      padding: 2px 8px; border-radius: 50px; font-size: 10px; font-weight: 700;
+      background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; letter-spacing: 0.06em;
+    }
+
+    .af-sent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+
+    /* Sentiment gauge */
+    .af-sent-gauge {
+      background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 18px;
+      text-align: center;
+    }
+    .af-gauge-label { font-size: 12px; font-weight: 600; color: var(--af-slate-400); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .af-gauge-bar {
+      position: relative; height: 10px; border-radius: 5px; margin-bottom: 8px;
+      background: linear-gradient(90deg, #dc2626, #f59e0b, #22c55e);
+    }
+    .af-gauge-needle {
+      position: absolute; top: -4px; width: 4px; height: 18px;
+      background: var(--af-slate-900); border-radius: 2px;
+      transform: translateX(-50%); transition: left 0.5s ease;
+    }
+    .af-gauge-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--af-slate-400); }
+    .af-gauge-score {
+      font-family: var(--af-font-display); font-size: 22px; font-weight: 600; margin-top: 6px;
+    }
+    .af-gauge-score.bearish { color: #dc2626; }
+    .af-gauge-score.neutral { color: #f59e0b; }
+    .af-gauge-score.bullish { color: #22c55e; }
+
+    /* Social volume */
+    .af-sent-volume {
+      background: var(--af-sand-50); border-radius: var(--af-radius-md); padding: 18px;
+    }
+    .af-vol-label { font-size: 12px; font-weight: 600; color: var(--af-slate-400); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .af-vol-bars { display: flex; align-items: flex-end; gap: 3px; height: 50px; }
+    .af-vol-bar {
+      flex: 1; border-radius: 2px 2px 0 0; transition: background 0.2s;
+    }
+    .af-vol-bar.normal { background: var(--af-green-300); }
+    .af-vol-bar.elevated { background: var(--af-amber); }
+    .af-vol-bar.spike { background: #dc2626; }
+    .af-vol-bar:hover { opacity: 0.8; }
+    .af-vol-meta { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--af-slate-400); }
+    .af-vol-spike-badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+      border-radius: 50px; font-size: 11px; font-weight: 600; margin-top: 6px;
+    }
+    .af-vol-spike-badge.red { background: #fee2e2; color: #dc2626; }
+    .af-vol-spike-badge.amber { background: #fef3c7; color: #d97706; }
+    .af-vol-spike-badge.green { background: var(--af-green-100); color: var(--af-green-800); }
+
+    /* Source breakdown */
+    .af-sent-sources { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .af-sent-source {
+      background: var(--af-sand-50); border-radius: var(--af-radius-sm); padding: 12px;
+      text-align: center;
+    }
+    .af-sent-source .src-icon { font-size: 18px; margin-bottom: 4px; }
+    .af-sent-source .src-name { font-size: 11px; font-weight: 600; color: var(--af-slate-400); text-transform: uppercase; letter-spacing: 0.05em; }
+    .af-sent-source .src-score { font-size: 16px; font-weight: 700; margin-top: 2px; }
+    .af-sent-source .src-score.pos { color: #22c55e; }
+    .af-sent-source .src-score.neg { color: #dc2626; }
+    .af-sent-source .src-score.neu { color: #f59e0b; }
+    .af-sent-source .src-count { font-size: 10px; color: var(--af-slate-400); margin-top: 2px; }
+
+    /* PR Crisis inline alert */
+    .af-crisis-inline {
+      margin-top: 14px; padding: 14px 18px; border-radius: var(--af-radius-sm);
+      border-left: 3px solid; font-size: 13px; line-height: 1.55;
+    }
+    .af-crisis-inline.critical { background: #fef2f2; border-color: #dc2626; color: #991b1b; }
+    .af-crisis-inline.warning { background: #fffbeb; border-color: #d97706; color: #92400e; }
+    .af-crisis-inline strong { display: block; margin-bottom: 4px; }
+
+    /* ---- Sentiment Overview Tab ---- */
+    .af-sent-overview-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 24px; }
+    .af-sent-overview-card {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 24px;
+    }
+    .af-sent-ov-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .af-sent-ov-ticker {
+      width: 36px; height: 36px; border-radius: var(--af-radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: white;
+    }
+    .af-sent-ov-name { font-weight: 600; font-size: 14px; color: var(--af-slate-800); }
+    .af-sent-ov-score-row { display: flex; align-items: center; gap: 12px; }
+    .af-sent-ov-score {
+      font-family: var(--af-font-display); font-size: 32px; font-weight: 600;
+    }
+    .af-sent-ov-label {
+      font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 50px;
+    }
+    .af-sent-ov-label.bullish { background: #dcfce7; color: #166534; }
+    .af-sent-ov-label.bearish { background: #fee2e2; color: #991b1b; }
+    .af-sent-ov-label.neutral { background: #fef3c7; color: #92400e; }
+    .af-sent-ov-detail { font-size: 12px; color: var(--af-slate-400); margin-top: 8px; line-height: 1.5; }
+
+    /* Trending topics */
+    .af-trending {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); padding: 24px;
+    }
+    .af-trending h3 {
+      font-family: var(--af-font-display); font-size: 18px; font-weight: 500;
+      color: var(--af-slate-900); margin-bottom: 16px;
+    }
+    .af-trend-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--af-sand-50);
+    }
+    .af-trend-item:last-child { border-bottom: none; }
+    .af-trend-left { display: flex; align-items: center; gap: 10px; }
+    .af-trend-rank {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--af-sand-100);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--af-slate-500);
+    }
+    .af-trend-topic { font-size: 14px; font-weight: 500; color: var(--af-slate-800); }
+    .af-trend-stock { font-size: 12px; color: var(--af-slate-400); }
+    .af-trend-right { display: flex; align-items: center; gap: 8px; }
+    .af-trend-mentions { font-size: 12px; color: var(--af-slate-400); }
+    .af-trend-direction {
+      padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;
+    }
+    .af-trend-direction.up { background: #dcfce7; color: #166534; }
+    .af-trend-direction.down { background: #fee2e2; color: #991b1b; }
+    .af-trend-direction.spike-dir { background: #fef3c7; color: #92400e; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 900px) {
+      .af-sh-summary { grid-template-columns: 1fr 1fr; }
+      .af-sh-details { grid-template-columns: 1fr 1fr; }
+      .af-sh-holdings { grid-template-columns: 1fr; }
+      .af-sent-grid { grid-template-columns: 1fr; }
+      .af-sent-sources { grid-template-columns: 1fr 1fr 1fr; }
+      .af-sent-overview-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .af-sh-summary { grid-template-columns: 1fr; }
+      .af-sh-details { grid-template-columns: 1fr; }
+      .af-sent-sources { grid-template-columns: 1fr; }
+      .af-acc-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .af-acc-right { width: 100%; justify-content: space-between; }
+      .af-tabs { overflow-x: auto; }
+      .af-tab { white-space: nowrap; padding: 12px 16px; }
+      .af-alert-card { flex-direction: column; }
+    }
+  </style>
+</head>
+<body data-page="shares">
+  <div id="header-placeholder"></div>
+  <main>
+    <div class="af-page-header">
+      <div class="af-inner">
+        <h1>Shares</h1>
+        <p>Your individual shareholdings with real-time pricing and AI-powered sentiment analysis.</p>
+      </div>
+    </div>
+    <div class="af-page-body">
+      <div class="af-inner">
+
+        <!-- PR Crisis Alerts -->
+        <div class="af-alerts">
+          <div class="af-alert-card critical">
+            <div class="af-alert-icon">🚨</div>
+            <div class="af-alert-body">
+              <span class="af-alert-badge critical-badge">⚡ PR Crisis Detected</span>
+              <div class="af-alert-title">Tesla (TSLA) — Elon Musk controversial statement triggers sell-off</div>
+              <div class="af-alert-desc">Elon Musk posted a series of inflammatory statements on X regarding government contracts and regulatory bodies. Sentiment has shifted sharply negative across all monitored channels. Social mentions up 4,200% in the last 6 hours. Multiple institutional analysts have issued "hold" downgrades.</div>
+              <div class="af-alert-meta">
+                <span>Detected 2 hours ago</span>
+                <span class="af-alert-metric neg">Sentiment: -78%</span>
+                <span class="af-alert-metric spike">Mentions: 142k in 6hrs</span>
+              </div>
+            </div>
+            <button class="af-alert-dismiss" onclick="this.closest('.af-alert-card').style.display='none'">Dismiss</button>
+          </div>
+
+          <div class="af-alert-card warning">
+            <div class="af-alert-icon">⚠️</div>
+            <div class="af-alert-body">
+              <span class="af-alert-badge warning-badge">⚡ PR Crisis Detected</span>
+              <div class="af-alert-title">BP (BP.) — Oil spill reported in North Sea operations</div>
+              <div class="af-alert-desc">Reports emerging of a significant oil spill from BP's North Sea operations. Environmental groups are mobilising and #BoycottBP is trending. News coverage accelerating. Share price down 4.2% in early trading. Monitoring for regulatory response.</div>
+              <div class="af-alert-meta">
+                <span>Detected 5 hours ago</span>
+                <span class="af-alert-metric neg">Sentiment: -62%</span>
+                <span class="af-alert-metric spike">Mentions: 38k in 5hrs</span>
+              </div>
+            </div>
+            <button class="af-alert-dismiss" onclick="this.closest('.af-alert-card').style.display='none'">Dismiss</button>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="af-sh-summary">
+          <div class="af-sh-stat">
+            <div class="label">Portfolio Value</div>
+            <div class="value">£8,742</div>
+            <div class="sub down">↓ -£486 (-5.3%) today</div>
+          </div>
+          <div class="af-sh-stat">
+            <div class="label">Total Gain/Loss</div>
+            <div class="value" style="color: var(--af-green-700);">+£1,218</div>
+            <div class="sub up">+16.2% all time</div>
+          </div>
+          <div class="af-sh-stat">
+            <div class="label">Dividends (YTD)</div>
+            <div class="value">£124</div>
+            <div class="sub" style="color: var(--af-slate-400);">From 3 holdings</div>
+          </div>
+          <div class="af-sh-stat">
+            <div class="label">Avg. Sentiment</div>
+            <div class="value" style="color: #f59e0b;">Mixed</div>
+            <div class="sub" style="color: var(--af-slate-400);">2 alerts active</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="af-tabs">
+          <button class="af-tab active" data-tab="holdings" onclick="switchTab('holdings')">My Holdings</button>
+          <button class="af-tab" data-tab="sentiment" onclick="switchTab('sentiment')">Sentiment Overview</button>
+        </div>
+
+        <!-- ===== TAB: Holdings ===== -->
+        <div class="af-tab-panel active" id="panel-holdings">
+          <div class="af-accordion">
+
+            <!-- TESLA -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-sh-ticker" style="background: #e31937;">TSLA</div>
+                  <div>
+                    <div class="af-acc-name">Tesla Inc</div>
+                    <div class="af-acc-detail">NASDAQ · 8 shares</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-sh-price">$248.30</div>
+                    <div class="af-sh-change down">↓ -$18.70 (-7.0%) today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-sh-holdings">
+                    <div class="af-sh-hold-card"><div class="dlabel">Your Holding</div><div class="dvalue">8 shares · £1,640</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Avg. Buy Price</div><div class="dvalue">$182.40</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color: var(--af-green-700);">+£396 (+31.8%)</div></div>
+                  </div>
+                  <div class="af-sh-details">
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">$358.64</div><div class="dsub">19 Dec 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">$138.80</div><div class="dsub">22 Apr 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">YTD</div><div class="dvalue" style="color: var(--af-red);">-23.4%</div><div class="dsub">From $324.10</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">Market Cap</div><div class="dvalue">$793B</div><div class="dsub">Mega cap</div></div>
+                  </div>
+                  <div class="af-sh-chart-wrap">
+                    <div class="af-sh-chart-label">Performance</div>
+                    <div class="af-sh-chart-period">
+                      <button class="af-sh-chart-btn">1D</button><button class="af-sh-chart-btn">1W</button><button class="af-sh-chart-btn active">1M</button><button class="af-sh-chart-btn">6M</button><button class="af-sh-chart-btn">1Y</button>
+                    </div>
+                    <div class="af-sh-chart">
+                      <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <defs><linearGradient id="tslafill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.15"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0,20 L30,18 L60,25 L90,22 L120,30 L150,35 L180,28 L210,45 L240,50 L270,55 L300,65 L330,80 L360,75 L400,95" fill="url(#tslafill)" stroke="none"/>
+                        <path d="M0,20 L30,18 L60,25 L90,22 L120,30 L150,35 L180,28 L210,45 L240,50 L270,55 L300,65 L330,80 L360,75 L400,95" fill="none" stroke="#dc2626" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="af-sent">
+                    <div class="af-sent-title">Sentiment Analysis <span class="ai-badge">AI</span></div>
+                    <div class="af-sent-grid">
+                      <div class="af-sent-gauge">
+                        <div class="af-gauge-label">Fear / Greed Index</div>
+                        <div class="af-gauge-bar"><div class="af-gauge-needle" style="left: 12%;"></div></div>
+                        <div class="af-gauge-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
+                        <div class="af-gauge-score bearish">Extreme Fear</div>
+                      </div>
+                      <div class="af-sent-volume">
+                        <div class="af-vol-label">Social Mention Volume (7 days)</div>
+                        <div class="af-vol-bars">
+                          <div class="af-vol-bar normal" style="height:25%"></div>
+                          <div class="af-vol-bar normal" style="height:30%"></div>
+                          <div class="af-vol-bar normal" style="height:22%"></div>
+                          <div class="af-vol-bar normal" style="height:28%"></div>
+                          <div class="af-vol-bar elevated" style="height:45%"></div>
+                          <div class="af-vol-bar elevated" style="height:60%"></div>
+                          <div class="af-vol-bar spike" style="height:100%"></div>
+                        </div>
+                        <div class="af-vol-meta"><span>4 Feb</span><span>Today</span></div>
+                        <span class="af-vol-spike-badge red">🔺 +4,200% spike — PR crisis</span>
+                      </div>
+                    </div>
+                    <div class="af-sent-sources">
+                      <div class="af-sent-source"><div class="src-icon">𝕏</div><div class="src-name">X / Twitter</div><div class="src-score neg">-82%</div><div class="src-count">94k mentions</div></div>
+                      <div class="af-sent-source"><div class="src-icon">📰</div><div class="src-name">News</div><div class="src-score neg">-71%</div><div class="src-count">1.2k articles</div></div>
+                      <div class="af-sent-source"><div class="src-icon">💬</div><div class="src-name">Reddit</div><div class="src-score neg">-68%</div><div class="src-count">12k posts</div></div>
+                    </div>
+                    <div class="af-crisis-inline critical">
+                      <strong>🚨 Active PR Crisis — Elon Musk controversial statements</strong>
+                      Sentiment collapsed from +34% to -78% within 4 hours. Historically, Tesla recovers from Musk-driven controversies within 5–12 trading days. However, this event coincides with pending regulatory reviews which may extend the impact. Consider holding — panic selling during similar events has historically locked in losses.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BP -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-sh-ticker" style="background: #009b3a;">BP.</div>
+                  <div>
+                    <div class="af-acc-name">BP plc</div>
+                    <div class="af-acc-detail">LSE · 200 shares</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-sh-price">£4.12</div>
+                    <div class="af-sh-change down">↓ -18.2p (-4.2%) today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-sh-holdings">
+                    <div class="af-sh-hold-card"><div class="dlabel">Your Holding</div><div class="dvalue">200 shares · £824</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Avg. Buy Price</div><div class="dvalue">£3.86</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color: var(--af-green-700);">+£52 (+6.7%)</div></div>
+                  </div>
+                  <div class="af-sh-details">
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£5.18</div><div class="dsub">3 Oct 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£3.62</div><div class="dsub">14 Jun 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">YTD</div><div class="dvalue" style="color: var(--af-red);">-8.9%</div><div class="dsub">From £4.52</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">Dividend Yield</div><div class="dvalue">5.8%</div><div class="dsub">Quarterly</div></div>
+                  </div>
+                  <div class="af-sh-chart-wrap">
+                    <div class="af-sh-chart-label">Performance</div>
+                    <div class="af-sh-chart-period">
+                      <button class="af-sh-chart-btn">1D</button><button class="af-sh-chart-btn">1W</button><button class="af-sh-chart-btn active">1M</button><button class="af-sh-chart-btn">6M</button><button class="af-sh-chart-btn">1Y</button>
+                    </div>
+                    <div class="af-sh-chart">
+                      <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <defs><linearGradient id="bpfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dc2626" stop-opacity="0.12"/><stop offset="100%" stop-color="#dc2626" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0,30 L30,28 L60,32 L90,35 L120,33 L150,38 L180,40 L210,42 L240,48 L270,52 L300,50 L330,58 L360,72 L400,80" fill="url(#bpfill)" stroke="none"/>
+                        <path d="M0,30 L30,28 L60,32 L90,35 L120,33 L150,38 L180,40 L210,42 L240,48 L270,52 L300,50 L330,58 L360,72 L400,80" fill="none" stroke="#dc2626" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="af-sent">
+                    <div class="af-sent-title">Sentiment Analysis <span class="ai-badge">AI</span></div>
+                    <div class="af-sent-grid">
+                      <div class="af-sent-gauge">
+                        <div class="af-gauge-label">Fear / Greed Index</div>
+                        <div class="af-gauge-bar"><div class="af-gauge-needle" style="left: 22%;"></div></div>
+                        <div class="af-gauge-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
+                        <div class="af-gauge-score bearish">Fear</div>
+                      </div>
+                      <div class="af-sent-volume">
+                        <div class="af-vol-label">Social Mention Volume (7 days)</div>
+                        <div class="af-vol-bars">
+                          <div class="af-vol-bar normal" style="height:15%"></div>
+                          <div class="af-vol-bar normal" style="height:18%"></div>
+                          <div class="af-vol-bar normal" style="height:20%"></div>
+                          <div class="af-vol-bar normal" style="height:16%"></div>
+                          <div class="af-vol-bar normal" style="height:22%"></div>
+                          <div class="af-vol-bar elevated" style="height:55%"></div>
+                          <div class="af-vol-bar spike" style="height:85%"></div>
+                        </div>
+                        <div class="af-vol-meta"><span>4 Feb</span><span>Today</span></div>
+                        <span class="af-vol-spike-badge red">🔺 +1,800% spike — oil spill</span>
+                      </div>
+                    </div>
+                    <div class="af-sent-sources">
+                      <div class="af-sent-source"><div class="src-icon">𝕏</div><div class="src-name">X / Twitter</div><div class="src-score neg">-65%</div><div class="src-count">22k mentions</div></div>
+                      <div class="af-sent-source"><div class="src-icon">📰</div><div class="src-name">News</div><div class="src-score neg">-58%</div><div class="src-count">480 articles</div></div>
+                      <div class="af-sent-source"><div class="src-icon">💬</div><div class="src-name">Reddit</div><div class="src-score neg">-52%</div><div class="src-count">3.4k posts</div></div>
+                    </div>
+                    <div class="af-crisis-inline warning">
+                      <strong>⚠️ Active PR Crisis — North Sea oil spill</strong>
+                      #BoycottBP trending with 38k mentions. Environmental regulatory response pending. BP's Deepwater Horizon spill in 2010 caused a 55% share price decline over 3 months. This event appears smaller in scale, but monitoring is critical. Dividend is currently secure based on cash reserves, but environmental fines could impact future payouts.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AstraZeneca -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-sh-ticker" style="background: #830051;">AZN</div>
+                  <div>
+                    <div class="af-acc-name">AstraZeneca plc</div>
+                    <div class="af-acc-detail">LSE · 15 shares</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-sh-price">£118.42</div>
+                    <div class="af-sh-change up">↑ +£1.86 (+1.6%) today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-sh-holdings">
+                    <div class="af-sh-hold-card"><div class="dlabel">Your Holding</div><div class="dvalue">15 shares · £1,776</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Avg. Buy Price</div><div class="dvalue">£104.20</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color: var(--af-green-700);">+£213 (+13.7%)</div></div>
+                  </div>
+                  <div class="af-sh-details">
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£126.80</div><div class="dsub">12 Jan 2026</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£94.30</div><div class="dsub">8 May 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">YTD</div><div class="dvalue" style="color: var(--af-green-700);">+8.2%</div><div class="dsub">From £109.44</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">Dividend Yield</div><div class="dvalue">2.1%</div><div class="dsub">Semi-annual</div></div>
+                  </div>
+                  <div class="af-sh-chart-wrap">
+                    <div class="af-sh-chart-label">Performance</div>
+                    <div class="af-sh-chart-period"><button class="af-sh-chart-btn">1D</button><button class="af-sh-chart-btn">1W</button><button class="af-sh-chart-btn active">1M</button><button class="af-sh-chart-btn">6M</button><button class="af-sh-chart-btn">1Y</button></div>
+                    <div class="af-sh-chart">
+                      <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <defs><linearGradient id="aznfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.15"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0,85 L30,80 L60,78 L90,72 L120,68 L150,65 L180,60 L210,55 L240,50 L270,45 L300,40 L330,38 L360,32 L400,28" fill="url(#aznfill)" stroke="none"/>
+                        <path d="M0,85 L30,80 L60,78 L90,72 L120,68 L150,65 L180,60 L210,55 L240,50 L270,45 L300,40 L330,38 L360,32 L400,28" fill="none" stroke="#22c55e" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="af-sent">
+                    <div class="af-sent-title">Sentiment Analysis <span class="ai-badge">AI</span></div>
+                    <div class="af-sent-grid">
+                      <div class="af-sent-gauge">
+                        <div class="af-gauge-label">Fear / Greed Index</div>
+                        <div class="af-gauge-bar"><div class="af-gauge-needle" style="left: 68%;"></div></div>
+                        <div class="af-gauge-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
+                        <div class="af-gauge-score bullish">Bullish</div>
+                      </div>
+                      <div class="af-sent-volume">
+                        <div class="af-vol-label">Social Mention Volume (7 days)</div>
+                        <div class="af-vol-bars">
+                          <div class="af-vol-bar normal" style="height:30%"></div><div class="af-vol-bar normal" style="height:35%"></div><div class="af-vol-bar normal" style="height:32%"></div><div class="af-vol-bar normal" style="height:38%"></div><div class="af-vol-bar normal" style="height:42%"></div><div class="af-vol-bar elevated" style="height:55%"></div><div class="af-vol-bar normal" style="height:40%"></div>
+                        </div>
+                        <div class="af-vol-meta"><span>4 Feb</span><span>Today</span></div>
+                        <span class="af-vol-spike-badge green">✓ Normal range — positive drug trial news</span>
+                      </div>
+                    </div>
+                    <div class="af-sent-sources">
+                      <div class="af-sent-source"><div class="src-icon">𝕏</div><div class="src-name">X / Twitter</div><div class="src-score pos">+54%</div><div class="src-count">4.2k mentions</div></div>
+                      <div class="af-sent-source"><div class="src-icon">📰</div><div class="src-name">News</div><div class="src-score pos">+62%</div><div class="src-count">140 articles</div></div>
+                      <div class="af-sent-source"><div class="src-icon">💬</div><div class="src-name">Reddit</div><div class="src-score pos">+48%</div><div class="src-count">890 posts</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lloyds Banking Group -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-sh-ticker" style="background: #006a4d;">LLOY</div>
+                  <div>
+                    <div class="af-acc-name">Lloyds Banking Group</div>
+                    <div class="af-acc-detail">LSE · 1,500 shares</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-sh-price">£0.628</div>
+                    <div class="af-sh-change up">↑ +0.8p (+1.3%) today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-sh-holdings">
+                    <div class="af-sh-hold-card"><div class="dlabel">Your Holding</div><div class="dvalue">1,500 shares · £942</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Avg. Buy Price</div><div class="dvalue">£0.548</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color: var(--af-green-700);">+£120 (+14.6%)</div></div>
+                  </div>
+                  <div class="af-sh-details">
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£0.682</div><div class="dsub">28 Jan 2026</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£0.468</div><div class="dsub">11 Mar 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">YTD</div><div class="dvalue" style="color: var(--af-green-700);">+4.7%</div><div class="dsub">From £0.600</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">Dividend Yield</div><div class="dvalue">4.6%</div><div class="dsub">Bi-annual</div></div>
+                  </div>
+                  <div class="af-sh-chart-wrap">
+                    <div class="af-sh-chart-label">Performance</div>
+                    <div class="af-sh-chart-period"><button class="af-sh-chart-btn">1D</button><button class="af-sh-chart-btn">1W</button><button class="af-sh-chart-btn active">1M</button><button class="af-sh-chart-btn">6M</button><button class="af-sh-chart-btn">1Y</button></div>
+                    <div class="af-sh-chart">
+                      <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <defs><linearGradient id="lloyfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.12"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0,70 L30,65 L60,68 L90,60 L120,55 L150,58 L180,52 L210,48 L240,45 L270,42 L300,44 L330,38 L360,35 L400,32" fill="url(#lloyfill)" stroke="none"/>
+                        <path d="M0,70 L30,65 L60,68 L90,60 L120,55 L150,58 L180,52 L210,48 L240,45 L270,42 L300,44 L330,38 L360,35 L400,32" fill="none" stroke="#22c55e" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="af-sent">
+                    <div class="af-sent-title">Sentiment Analysis <span class="ai-badge">AI</span></div>
+                    <div class="af-sent-grid">
+                      <div class="af-sent-gauge">
+                        <div class="af-gauge-label">Fear / Greed Index</div>
+                        <div class="af-gauge-bar"><div class="af-gauge-needle" style="left: 58%;"></div></div>
+                        <div class="af-gauge-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
+                        <div class="af-gauge-score neutral">Mildly Bullish</div>
+                      </div>
+                      <div class="af-sent-volume">
+                        <div class="af-vol-label">Social Mention Volume (7 days)</div>
+                        <div class="af-vol-bars">
+                          <div class="af-vol-bar normal" style="height:20%"></div><div class="af-vol-bar normal" style="height:22%"></div><div class="af-vol-bar normal" style="height:18%"></div><div class="af-vol-bar normal" style="height:25%"></div><div class="af-vol-bar normal" style="height:20%"></div><div class="af-vol-bar normal" style="height:28%"></div><div class="af-vol-bar normal" style="height:24%"></div>
+                        </div>
+                        <div class="af-vol-meta"><span>4 Feb</span><span>Today</span></div>
+                        <span class="af-vol-spike-badge green">✓ Stable — no unusual activity</span>
+                      </div>
+                    </div>
+                    <div class="af-sent-sources">
+                      <div class="af-sent-source"><div class="src-icon">𝕏</div><div class="src-name">X / Twitter</div><div class="src-score pos">+22%</div><div class="src-count">1.8k mentions</div></div>
+                      <div class="af-sent-source"><div class="src-icon">📰</div><div class="src-name">News</div><div class="src-score pos">+31%</div><div class="src-count">62 articles</div></div>
+                      <div class="af-sent-source"><div class="src-icon">💬</div><div class="src-name">Reddit</div><div class="src-score neu">+8%</div><div class="src-count">420 posts</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Apple -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-sh-ticker" style="background: #555555;">AAPL</div>
+                  <div>
+                    <div class="af-acc-name">Apple Inc</div>
+                    <div class="af-acc-detail">NASDAQ · 12 shares</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-sh-price">$224.80</div>
+                    <div class="af-sh-change up">↑ +$3.40 (+1.5%) today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-sh-holdings">
+                    <div class="af-sh-hold-card"><div class="dlabel">Your Holding</div><div class="dvalue">12 shares · £2,228</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Avg. Buy Price</div><div class="dvalue">$178.50</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color: var(--af-green-700);">+£390 (+25.9%)</div></div>
+                  </div>
+                  <div class="af-sh-details">
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">$260.10</div><div class="dsub">26 Dec 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">$164.08</div><div class="dsub">19 Apr 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">YTD</div><div class="dvalue" style="color: var(--af-red);">-4.1%</div><div class="dsub">From $234.40</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">Dividend Yield</div><div class="dvalue">0.5%</div><div class="dsub">Quarterly</div></div>
+                  </div>
+                  <div class="af-sh-chart-wrap">
+                    <div class="af-sh-chart-label">Performance</div>
+                    <div class="af-sh-chart-period"><button class="af-sh-chart-btn">1D</button><button class="af-sh-chart-btn">1W</button><button class="af-sh-chart-btn active">1M</button><button class="af-sh-chart-btn">6M</button><button class="af-sh-chart-btn">1Y</button></div>
+                    <div class="af-sh-chart">
+                      <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <defs><linearGradient id="aaplfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.1"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0,45 L30,42 L60,48 L90,44 L120,40 L150,38 L180,42 L210,36 L240,38 L270,34 L300,36 L330,32 L360,30 L400,34" fill="url(#aaplfill)" stroke="none"/>
+                        <path d="M0,45 L30,42 L60,48 L90,44 L120,40 L150,38 L180,42 L210,36 L240,38 L270,34 L300,36 L330,32 L360,30 L400,34" fill="none" stroke="#22c55e" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="af-sent">
+                    <div class="af-sent-title">Sentiment Analysis <span class="ai-badge">AI</span></div>
+                    <div class="af-sent-grid">
+                      <div class="af-sent-gauge">
+                        <div class="af-gauge-label">Fear / Greed Index</div>
+                        <div class="af-gauge-bar"><div class="af-gauge-needle" style="left: 62%;"></div></div>
+                        <div class="af-gauge-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
+                        <div class="af-gauge-score bullish">Bullish</div>
+                      </div>
+                      <div class="af-sent-volume">
+                        <div class="af-vol-label">Social Mention Volume (7 days)</div>
+                        <div class="af-vol-bars">
+                          <div class="af-vol-bar normal" style="height:35%"></div><div class="af-vol-bar normal" style="height:32%"></div><div class="af-vol-bar normal" style="height:38%"></div><div class="af-vol-bar normal" style="height:40%"></div><div class="af-vol-bar normal" style="height:36%"></div><div class="af-vol-bar normal" style="height:42%"></div><div class="af-vol-bar normal" style="height:38%"></div>
+                        </div>
+                        <div class="af-vol-meta"><span>4 Feb</span><span>Today</span></div>
+                        <span class="af-vol-spike-badge green">✓ Stable — earnings beat expectations</span>
+                      </div>
+                    </div>
+                    <div class="af-sent-sources">
+                      <div class="af-sent-source"><div class="src-icon">𝕏</div><div class="src-name">X / Twitter</div><div class="src-score pos">+44%</div><div class="src-count">18k mentions</div></div>
+                      <div class="af-sent-source"><div class="src-icon">📰</div><div class="src-name">News</div><div class="src-score pos">+52%</div><div class="src-count">320 articles</div></div>
+                      <div class="af-sent-source"><div class="src-icon">💬</div><div class="src-name">Reddit</div><div class="src-score pos">+38%</div><div class="src-count">5.6k posts</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rolls-Royce -->
+            <div class="af-acc-item">
+              <div class="af-acc-header" onclick="toggleAccordion(this)">
+                <div class="af-acc-left">
+                  <div class="af-sh-ticker" style="background: #1b1464;">RR.</div>
+                  <div>
+                    <div class="af-acc-name">Rolls-Royce Holdings</div>
+                    <div class="af-acc-detail">LSE · 300 shares</div>
+                  </div>
+                </div>
+                <div class="af-acc-right">
+                  <div>
+                    <div class="af-sh-price">£6.44</div>
+                    <div class="af-sh-change up">↑ +8.2p (+1.3%) today</div>
+                  </div>
+                  <svg class="af-acc-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="af-acc-body">
+                <div class="af-acc-body-inner">
+                  <div class="af-sh-holdings">
+                    <div class="af-sh-hold-card"><div class="dlabel">Your Holding</div><div class="dvalue">300 shares · £1,932</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Avg. Buy Price</div><div class="dvalue">£4.92</div></div>
+                    <div class="af-sh-hold-card"><div class="dlabel">Total Return</div><div class="dvalue" style="color: var(--af-green-700);">+£456 (+30.9%)</div></div>
+                  </div>
+                  <div class="af-sh-details">
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week High</div><div class="dvalue">£7.12</div><div class="dsub">6 Nov 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">52-Week Low</div><div class="dvalue">£4.24</div><div class="dsub">1 Mar 2025</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">YTD</div><div class="dvalue" style="color: var(--af-red);">-2.1%</div><div class="dsub">From £6.58</div></div>
+                    <div class="af-sh-detail-card"><div class="dlabel">Dividend Yield</div><div class="dvalue">0.8%</div><div class="dsub">Resumed 2025</div></div>
+                  </div>
+                  <div class="af-sh-chart-wrap">
+                    <div class="af-sh-chart-label">Performance</div>
+                    <div class="af-sh-chart-period"><button class="af-sh-chart-btn">1D</button><button class="af-sh-chart-btn">1W</button><button class="af-sh-chart-btn active">1M</button><button class="af-sh-chart-btn">6M</button><button class="af-sh-chart-btn">1Y</button></div>
+                    <div class="af-sh-chart">
+                      <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+                        <defs><linearGradient id="rrfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#22c55e" stop-opacity="0.1"/><stop offset="100%" stop-color="#22c55e" stop-opacity="0"/></linearGradient></defs>
+                        <path d="M0,55 L30,50 L60,52 L90,48 L120,45 L150,42 L180,46 L210,40 L240,38 L270,42 L300,36 L330,34 L360,38 L400,35" fill="url(#rrfill)" stroke="none"/>
+                        <path d="M0,55 L30,50 L60,52 L90,48 L120,45 L150,42 L180,46 L210,40 L240,38 L270,42 L300,36 L330,34 L360,38 L400,35" fill="none" stroke="#22c55e" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="af-sent">
+                    <div class="af-sent-title">Sentiment Analysis <span class="ai-badge">AI</span></div>
+                    <div class="af-sent-grid">
+                      <div class="af-sent-gauge">
+                        <div class="af-gauge-label">Fear / Greed Index</div>
+                        <div class="af-gauge-bar"><div class="af-gauge-needle" style="left: 72%;"></div></div>
+                        <div class="af-gauge-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
+                        <div class="af-gauge-score bullish">Bullish</div>
+                      </div>
+                      <div class="af-sent-volume">
+                        <div class="af-vol-label">Social Mention Volume (7 days)</div>
+                        <div class="af-vol-bars">
+                          <div class="af-vol-bar normal" style="height:28%"></div><div class="af-vol-bar normal" style="height:32%"></div><div class="af-vol-bar normal" style="height:30%"></div><div class="af-vol-bar elevated" style="height:48%"></div><div class="af-vol-bar normal" style="height:35%"></div><div class="af-vol-bar normal" style="height:30%"></div><div class="af-vol-bar normal" style="height:33%"></div>
+                        </div>
+                        <div class="af-vol-meta"><span>4 Feb</span><span>Today</span></div>
+                        <span class="af-vol-spike-badge green">✓ Stable — defence contract speculation</span>
+                      </div>
+                    </div>
+                    <div class="af-sent-sources">
+                      <div class="af-sent-source"><div class="src-icon">𝕏</div><div class="src-name">X / Twitter</div><div class="src-score pos">+56%</div><div class="src-count">6.8k mentions</div></div>
+                      <div class="af-sent-source"><div class="src-icon">📰</div><div class="src-name">News</div><div class="src-score pos">+64%</div><div class="src-count">92 articles</div></div>
+                      <div class="af-sent-source"><div class="src-icon">💬</div><div class="src-name">Reddit</div><div class="src-score pos">+48%</div><div class="src-count">2.1k posts</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ===== TAB: Sentiment Overview ===== -->
+        <div class="af-tab-panel" id="panel-sentiment">
+          <div class="af-sent-overview-grid">
+            <div class="af-sent-overview-card">
+              <div class="af-sent-ov-header">
+                <div class="af-sent-ov-ticker" style="background:#e31937;">TSLA</div>
+                <div><div class="af-sent-ov-name">Tesla Inc</div></div>
+              </div>
+              <div class="af-sent-ov-score-row">
+                <div class="af-sent-ov-score" style="color:#dc2626;">-78%</div>
+                <span class="af-sent-ov-label bearish">Bearish</span>
+              </div>
+              <div class="af-sent-ov-detail">🚨 <strong>PR Crisis active.</strong> Sentiment collapsed after Musk controversy. 142k social mentions in 6hrs. Historically recovers in 5–12 days.</div>
+            </div>
+            <div class="af-sent-overview-card">
+              <div class="af-sent-ov-header">
+                <div class="af-sent-ov-ticker" style="background:#009b3a;">BP.</div>
+                <div><div class="af-sent-ov-name">BP plc</div></div>
+              </div>
+              <div class="af-sent-ov-score-row">
+                <div class="af-sent-ov-score" style="color:#dc2626;">-62%</div>
+                <span class="af-sent-ov-label bearish">Bearish</span>
+              </div>
+              <div class="af-sent-ov-detail">⚠️ <strong>Oil spill crisis.</strong> #BoycottBP trending. Regulatory response pending. Dividend currently secure but under watch.</div>
+            </div>
+            <div class="af-sent-overview-card">
+              <div class="af-sent-ov-header">
+                <div class="af-sent-ov-ticker" style="background:#830051;">AZN</div>
+                <div><div class="af-sent-ov-name">AstraZeneca plc</div></div>
+              </div>
+              <div class="af-sent-ov-score-row">
+                <div class="af-sent-ov-score" style="color:#22c55e;">+54%</div>
+                <span class="af-sent-ov-label bullish">Bullish</span>
+              </div>
+              <div class="af-sent-ov-detail">Positive Phase III trial results driving optimism. Analyst upgrades from JP Morgan and Barclays. Strong institutional buying signals.</div>
+            </div>
+            <div class="af-sent-overview-card">
+              <div class="af-sent-ov-header">
+                <div class="af-sent-ov-ticker" style="background:#006a4d;">LLOY</div>
+                <div><div class="af-sent-ov-name">Lloyds Banking Group</div></div>
+              </div>
+              <div class="af-sent-ov-score-row">
+                <div class="af-sent-ov-score" style="color:#f59e0b;">+22%</div>
+                <span class="af-sent-ov-label neutral">Neutral</span>
+              </div>
+              <div class="af-sent-ov-detail">Steady sentiment. Interest rate outlook favourable. Motor finance mis-selling exposure remains a drag on full bullish conviction.</div>
+            </div>
+            <div class="af-sent-overview-card">
+              <div class="af-sent-ov-header">
+                <div class="af-sent-ov-ticker" style="background:#555;">AAPL</div>
+                <div><div class="af-sent-ov-name">Apple Inc</div></div>
+              </div>
+              <div class="af-sent-ov-score-row">
+                <div class="af-sent-ov-score" style="color:#22c55e;">+44%</div>
+                <span class="af-sent-ov-label bullish">Bullish</span>
+              </div>
+              <div class="af-sent-ov-detail">Strong Q1 earnings beat. Services revenue growth continues. Apple Intelligence rollout generating positive buzz. iPhone 17 leaks building anticipation.</div>
+            </div>
+            <div class="af-sent-overview-card">
+              <div class="af-sent-ov-header">
+                <div class="af-sent-ov-ticker" style="background:#1b1464;">RR.</div>
+                <div><div class="af-sent-ov-name">Rolls-Royce Holdings</div></div>
+              </div>
+              <div class="af-sent-ov-score-row">
+                <div class="af-sent-ov-score" style="color:#22c55e;">+56%</div>
+                <span class="af-sent-ov-label bullish">Bullish</span>
+              </div>
+              <div class="af-sent-ov-detail">Defence spending tailwinds. CEO Tufan Erginbilgic's turnaround strategy widely praised. Small modular reactor programme generating long-term optimism.</div>
+            </div>
+          </div>
+
+          <!-- Trending Topics -->
+          <div class="af-trending">
+            <h3>🔥 Trending Topics Across Your Holdings</h3>
+            <div class="af-trend-item">
+              <div class="af-trend-left">
+                <div class="af-trend-rank">1</div>
+                <div><div class="af-trend-topic">"Musk government contract controversy"</div><div class="af-trend-stock">TSLA · 94k mentions on X</div></div>
+              </div>
+              <div class="af-trend-right">
+                <span class="af-trend-mentions">+4,200%</span>
+                <span class="af-trend-direction down">Price ↓</span>
+              </div>
+            </div>
+            <div class="af-trend-item">
+              <div class="af-trend-left">
+                <div class="af-trend-rank">2</div>
+                <div><div class="af-trend-topic">"#BoycottBP North Sea spill"</div><div class="af-trend-stock">BP. · 22k mentions on X</div></div>
+              </div>
+              <div class="af-trend-right">
+                <span class="af-trend-mentions">+1,800%</span>
+                <span class="af-trend-direction down">Price ↓</span>
+              </div>
+            </div>
+            <div class="af-trend-item">
+              <div class="af-trend-left">
+                <div class="af-trend-rank">3</div>
+                <div><div class="af-trend-topic">"AstraZeneca Phase III breakthrough"</div><div class="af-trend-stock">AZN · 4.2k mentions on X</div></div>
+              </div>
+              <div class="af-trend-right">
+                <span class="af-trend-mentions">+340%</span>
+                <span class="af-trend-direction up">Price ↑</span>
+              </div>
+            </div>
+            <div class="af-trend-item">
+              <div class="af-trend-left">
+                <div class="af-trend-rank">4</div>
+                <div><div class="af-trend-topic">"Rolls-Royce SMR reactor deal rumour"</div><div class="af-trend-stock">RR. · 2.8k mentions on Reddit</div></div>
+              </div>
+              <div class="af-trend-right">
+                <span class="af-trend-mentions">+180%</span>
+                <span class="af-trend-direction spike-dir">Watching</span>
+              </div>
+            </div>
+            <div class="af-trend-item">
+              <div class="af-trend-left">
+                <div class="af-trend-rank">5</div>
+                <div><div class="af-trend-topic">"Apple Intelligence adoption rates"</div><div class="af-trend-stock">AAPL · 8.2k mentions across platforms</div></div>
+              </div>
+              <div class="af-trend-right">
+                <span class="af-trend-mentions">+85%</span>
+                <span class="af-trend-direction up">Price ↑</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.af-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.af-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+      document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+      document.getElementById('panel-' + tabId).classList.add('active');
+    }
+
+    function toggleAccordion(header) {
+      var item = header.closest('.af-acc-item');
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.af-acc-item').forEach(function(el) { el.classList.remove('open'); });
+      if (!wasOpen) { item.classList.add('open'); }
+    }
+
+    async function loadComponent(id, file) {
+      try {
+        var r = await fetch(file);
+        if (r.ok) {
+          document.getElementById(id).innerHTML = await r.text();
+          document.getElementById(id).querySelectorAll('script').forEach(function(o) {
+            var s = document.createElement('script');
+            s.textContent = o.textContent;
+            o.parentNode.replaceChild(s, o);
+          });
+        }
+      } catch(e) {}
+    }
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
+  </script>
+</body>
+</html>
