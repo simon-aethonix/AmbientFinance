@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Discussions — Ambient Finance</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .af-page-header { padding: 48px 0 32px; border-bottom: 1px solid var(--af-sand-200); background: var(--af-white); }
+    .af-page-header h1 { font-family: var(--af-font-display); font-size: 32px; font-weight: 500; color: var(--af-slate-900); letter-spacing: -0.02em; }
+    .af-page-header p { font-size: 16px; color: var(--af-slate-500); margin-top: 6px; }
+    .af-page-body { padding: 40px 0 80px; }
+    .af-inner { max-width: var(--af-container); margin: 0 auto; padding: 0 24px; }
+
+    /* Stats bar */
+    .af-disc-stats { display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+    .af-disc-stat {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--af-slate-500);
+    }
+    .af-disc-stat strong { color: var(--af-slate-800); }
+    .af-disc-stat-icon {
+      width: 28px; height: 28px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 14px;
+      background: var(--af-sand-100);
+    }
+
+    /* Filter/search bar */
+    .af-disc-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px; flex-wrap: wrap;
+    }
+    .af-disc-search {
+      display: flex; align-items: center; gap: 8px; flex: 1; max-width: 400px;
+      padding: 8px 16px; border: 1.5px solid var(--af-sand-200);
+      border-radius: 50px; background: var(--af-white);
+      transition: border-color 0.15s;
+    }
+    .af-disc-search:focus-within { border-color: var(--af-green-400); }
+    .af-disc-search input {
+      flex: 1; border: none; background: none; outline: none;
+      font-size: 14px; font-family: var(--af-font-body); color: var(--af-slate-800);
+    }
+    .af-disc-search input::placeholder { color: var(--af-slate-400); }
+    .af-disc-search svg { color: var(--af-slate-400); flex-shrink: 0; }
+
+    .af-disc-filters { display: flex; gap: 6px; }
+    .af-disc-filter-btn {
+      padding: 6px 14px; font-size: 12px; font-weight: 600; font-family: var(--af-font-body);
+      border: 1px solid var(--af-sand-200); border-radius: 50px; background: var(--af-white);
+      color: var(--af-slate-500); cursor: pointer; transition: all 0.15s;
+    }
+    .af-disc-filter-btn:hover { border-color: var(--af-green-300); color: var(--af-green-700); }
+    .af-disc-filter-btn.active { background: var(--af-green-50); border-color: var(--af-green-400); color: var(--af-green-700); }
+
+    /* Discussion cards */
+    .af-disc-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .af-disc-card {
+      background: var(--af-white); border: 1px solid var(--af-sand-200);
+      border-radius: var(--af-radius-lg); overflow: hidden;
+      transition: all 0.15s; cursor: pointer;
+    }
+    .af-disc-card:hover { border-color: var(--af-green-300); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+
+    .af-disc-card-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 20px 24px 0;
+    }
+    .af-disc-card-left { flex: 1; }
+    .af-disc-card-title {
+      font-size: 16px; font-weight: 600; color: var(--af-slate-900);
+      margin-bottom: 4px;
+    }
+    .af-disc-card-meta {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 12px; color: var(--af-slate-400);
+    }
+    .af-disc-card-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 600;
+    }
+    .af-disc-card-tag.accounts { background: var(--af-green-100); color: var(--af-green-800); }
+    .af-disc-card-tag.shares { background: #ede9fe; color: #6d28d9; }
+    .af-disc-card-tag.pensions { background: #e0f2fe; color: #0369a1; }
+    .af-disc-card-tag.investments { background: #fef3c7; color: #92400e; }
+    .af-disc-card-tag.general { background: var(--af-sand-100); color: var(--af-slate-600); }
+    .af-disc-card-tag.dashboard { background: #fce4ec; color: #ad1457; }
+
+    .af-disc-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .af-disc-card-date { font-size: 12px; color: var(--af-slate-400); white-space: nowrap; }
+    .af-disc-card-msgs {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: var(--af-slate-400);
+    }
+
+    /* Preview messages */
+    .af-disc-card-preview { padding: 14px 24px 20px; }
+    .af-disc-preview-msg {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 0; font-size: 13px; line-height: 1.5;
+    }
+    .af-disc-preview-msg + .af-disc-preview-msg {
+      border-top: 1px solid var(--af-sand-50);
+    }
+    .af-disc-preview-role {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 2px 6px; border-radius: 4px;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .af-disc-preview-role.you { background: var(--af-green-100); color: var(--af-green-800); }
+    .af-disc-preview-role.ai { background: #ede9fe; color: #6d28d9; }
+    .af-disc-preview-text { color: var(--af-slate-600); }
+    .af-disc-preview-text strong { color: var(--af-slate-800); }
+    .af-disc-preview-more {
+      font-size: 12px; font-weight: 600; color: var(--af-green-600);
+      padding: 6px 0 0; cursor: pointer;
+    }
+
+    /* Action row inside card */
+    .af-disc-card-actions {
+      display: flex; gap: 8px; padding: 0 24px 16px;
+    }
+    .af-disc-action {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 600;
+      font-family: var(--af-font-body);
+      border: 1px solid var(--af-sand-200); background: var(--af-white);
+      color: var(--af-slate-500); cursor: pointer; transition: all 0.15s;
+    }
+    .af-disc-action:hover { border-color: var(--af-green-300); color: var(--af-green-700); }
+
+    /* Date groups */
+    .af-disc-date-group {
+      font-size: 13px; font-weight: 600; color: var(--af-slate-400);
+      padding: 20px 0 8px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .af-disc-date-group:first-child { padding-top: 0; }
+
+    /* Empty state */
+    .af-disc-empty {
+      text-align: center; padding: 60px 20px;
+      color: var(--af-slate-400);
+    }
+    .af-disc-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+    .af-disc-empty h3 { font-family: var(--af-font-display); font-size: 20px; color: var(--af-slate-600); margin-bottom: 8px; }
+
+    @media (max-width: 600px) {
+      .af-disc-toolbar { flex-direction: column; }
+      .af-disc-search { max-width: 100%; }
+      .af-disc-card-header { flex-direction: column; gap: 8px; }
+      .af-disc-card-right { flex-direction: row; align-items: center; }
+    }
+  </style>
+</head>
+<body data-page="discussions">
+  <div id="header-placeholder"></div>
+  <main>
+    <div class="af-page-header">
+      <div class="af-inner">
+        <h1>AI Discussions</h1>
+        <p>Your conversation history with Ambient AI — pick up where you left off.</p>
+      </div>
+    </div>
+    <div class="af-page-body">
+      <div class="af-inner">
+
+        <!-- Stats -->
+        <div class="af-disc-stats">
+          <div class="af-disc-stat">
+            <div class="af-disc-stat-icon">💬</div>
+            <span><strong>23</strong> conversations</span>
+          </div>
+          <div class="af-disc-stat">
+            <div class="af-disc-stat-icon">📊</div>
+            <span><strong>142</strong> questions asked</span>
+          </div>
+          <div class="af-disc-stat">
+            <div class="af-disc-stat-icon">💡</div>
+            <span><strong>18</strong> actions taken from suggestions</span>
+          </div>
+          <div class="af-disc-stat">
+            <div class="af-disc-stat-icon">⏱️</div>
+            <span>Last chat: <strong>2 hours ago</strong></span>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="af-disc-toolbar">
+          <div class="af-disc-search">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input type="text" placeholder="Search conversations…">
+          </div>
+          <div class="af-disc-filters">
+            <button class="af-disc-filter-btn active">All</button>
+            <button class="af-disc-filter-btn">Accounts</button>
+            <button class="af-disc-filter-btn">Shares</button>
+            <button class="af-disc-filter-btn">Pensions</button>
+            <button class="af-disc-filter-btn">Investments</button>
+          </div>
+        </div>
+
+        <!-- Discussion List -->
+        <div class="af-disc-list">
+
+          <!-- Today -->
+          <div class="af-disc-date-group">Today — 10 February 2026</div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Tesla PR crisis — should I sell?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag shares">Shares</span>
+                  <span>8 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">10:42 AM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">Tesla is tanking after Musk's comments. I have 8 shares. Should I sell now or hold?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Your 8 Tesla shares are currently worth £1,640, and despite today's 7% drop you're still <strong>up 31.8% overall</strong>. Historically, Musk-driven controversies have caused 5-15% dips that recover within 5-12 trading days. However, this event coincides with pending regulatory reviews which could extend the impact. <strong>My suggestion: hold for now</strong> — panic selling during similar events has historically locked in unnecessary losses…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">BP oil spill impact on dividend</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag shares">Shares</span>
+                  <span>5 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">9:15 AM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">Will the BP oil spill affect my dividend? I bought BP mainly for income.</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">BP's current dividend yield is 5.8%, and based on their cash reserves and free cash flow, the <strong>dividend is likely secure in the short term</strong>. However, environmental fines could reach £50-200m depending on the scale of the spill. For context, the Deepwater Horizon incident in 2010 ultimately cost BP $65bn and led to a dividend suspension…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <!-- Yesterday -->
+          <div class="af-disc-date-group">Yesterday — 9 February 2026</div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Can I afford the Barclaycard payment this month?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag accounts">Accounts</span>
+                  <span>6 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">7:30 PM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">I've got the Barclaycard payment coming out on the 15th. Will I have enough in my current account to cover everything?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Let me check your upcoming commitments. Your current balance is <strong>£2,135</strong>. Between now and payday on 5 March, you have <strong>£1,915 in committed payments</strong> (Barclaycard £847, mortgage £942, Three £34, Sky £43, Admiral £49). That leaves roughly <strong>£220 for discretionary spending</strong> over 23 days — tight but manageable if you keep daily spending under £10…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <!-- Last Week -->
+          <div class="af-disc-date-group">5 February 2026</div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Retirement projection — what if I retire at 63?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag pensions">Pensions</span>
+                  <span>12 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">2:15 PM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">I'm thinking about early retirement. What would my income look like if I stopped work at 63 instead of 67?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Interesting question. Retiring at 63 would mean <strong>4 fewer years of contributions</strong> (saving ~£27,840 less) and <strong>4 fewer years of growth</strong>. Your projected pot at 63 would be approximately <strong>£308,200</strong> versus £339,650 at 67. At a 4% drawdown, that's <strong>£9,246/year</strong> from private pensions — but you'd have <strong>no state pension for 4 years</strong> until age 67. That 4-year gap would need to be funded entirely from your pot or savings…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Should I consolidate my Aviva pension?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag pensions">Pensions</span>
+                  <span>9 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">11:05 AM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">My Aviva pension charges seem high compared to Scottish Widows. Is it worth transferring?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Great question. Your Aviva pot charges <strong>0.75% p.a.</strong> versus Scottish Widows at <strong>0.32% p.a.</strong> On the current £40,850 balance, that's a difference of roughly <strong>£176/year</strong>. Over 7 years to retirement, assuming 5% growth, the compounding effect of lower charges could save you approximately <strong>£1,800-2,200</strong>. There are no exit penalties on your Aviva plan. However, check if your Scottish Widows scheme accepts external transfers…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <!-- Earlier -->
+          <div class="af-disc-date-group">30 January 2026</div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Maximising ISA allowance before April</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag investments">Investments</span>
+                  <span>7 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">6:45 PM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">I've got £12,400 left of my ISA allowance. Should I try to max it out before April? Where should I put it?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">With 10 weeks until the tax year ends, maxing your ISA would require roughly <strong>£1,240/week</strong> — that's probably unrealistic given your cash flow. A more achievable target might be an additional <strong>£2,000-3,000</strong>. For allocation, your current portfolio is well-diversified. I'd suggest continuing to feed your Vanguard Global All Cap, which has the lowest charges at 0.23%…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Why is Fundsmith underperforming?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag investments">Investments</span>
+                  <span>6 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">4:20 PM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">My Fundsmith Equity Fund is in the red while everything else is up. What's going on?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Fundsmith has been <strong>underperforming its benchmark since mid-2024</strong>, down 2.1% when global equities are broadly up. The fund is concentrated in just 27 quality stocks, and several key holdings (Novo Nordisk, L'Oréal) have faced headwinds. It also carries a <strong>1.05% ongoing charge</strong> — the highest in your portfolio. It's worth noting that Fundsmith has a strong 10-year track record, so this may be a temporary dip…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <div class="af-disc-date-group">22 January 2026</div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Monthly spending breakdown — where's my money going?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag accounts">Accounts</span>
+                  <span>10 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">8:10 PM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">Can you break down my January spending? I feel like I spent more than usual.</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Here's your January breakdown: <strong>Groceries £412</strong> (up 15% from Dec — post-Christmas restock), <strong>Fuel £168</strong> (normal), <strong>Dining out £142</strong> (up 40% — 3 restaurant visits), <strong>Subscriptions £52</strong> (Netflix, Spotify, Adobe), <strong>Shopping £289</strong> (including the £125 Amazon purchase that was flagged as unusual). Your total discretionary spending was <strong>£1,063</strong> versus a 3-month average of £890…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Rolls-Royce sentiment — is the hype justified?</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag shares">Shares</span>
+                  <span>4 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">1:30 PM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">Rolls-Royce keeps coming up as bullish in sentiment. Is this just Reddit hype or is there substance?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">There's genuine substance behind the Rolls-Royce optimism. CEO Tufan Erginbilgic's turnaround has delivered <strong>operating margin improvement from 6% to 14%</strong> since 2023. The defence spending tailwind is real — NATO members are increasing budgets. The SMR (small modular reactor) programme adds long-term optionality. However, the share price has already risen <strong>+520% from 2023 lows</strong>, so much of the good news is priced in…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+          <div class="af-disc-date-group">15 January 2026</div>
+
+          <div class="af-disc-card" onclick="">
+            <div class="af-disc-card-header">
+              <div class="af-disc-card-left">
+                <div class="af-disc-card-title">Mortgage remortgage timing — Oct 2026 deadline</div>
+                <div class="af-disc-card-meta">
+                  <span class="af-disc-card-tag general">General</span>
+                  <span>8 messages</span>
+                </div>
+              </div>
+              <div class="af-disc-card-right">
+                <div class="af-disc-card-date">10:00 AM</div>
+              </div>
+            </div>
+            <div class="af-disc-card-preview">
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role you">You</span>
+                <span class="af-disc-preview-text">My HSBC fixed rate ends in October. When should I start looking for a remortgage deal?</span>
+              </div>
+              <div class="af-disc-preview-msg">
+                <span class="af-disc-preview-role ai">AI</span>
+                <span class="af-disc-preview-text">Most lenders allow you to lock in a rate <strong>up to 6 months in advance</strong>, so you should start actively searching from <strong>April 2026</strong>. Your current rate is 4.19% on £186,420. At current market rates (Feb 2026), 2-year fixes are around 3.8-4.2% and 5-year fixes around 3.9-4.3%. With your LTV of approximately 65%, you should qualify for competitive rates. I'd recommend comparing via a whole-of-market broker…</span>
+              </div>
+              <div class="af-disc-preview-more">View full conversation →</div>
+            </div>
+            <div class="af-disc-card-actions">
+              <button class="af-disc-action" onclick="event.stopPropagation()">📌 Pin</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">📋 Export</button>
+              <button class="af-disc-action" onclick="event.stopPropagation()">🔄 Continue</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+
+  <script>
+    /* Filter buttons */
+    document.querySelectorAll('.af-disc-filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.af-disc-filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+      });
+    });
+
+    async function loadComponent(id, file) {
+      try {
+        var r = await fetch(file);
+        if (r.ok) {
+          document.getElementById(id).innerHTML = await r.text();
+          document.getElementById(id).querySelectorAll('script').forEach(function(o) {
+            var s = document.createElement('script');
+            s.textContent = o.textContent;
+            o.parentNode.replaceChild(s, o);
+          });
+        }
+      } catch(e) {}
+    }
+    loadComponent('header-placeholder', 'header.html');
+    loadComponent('footer-placeholder', 'footer.html');
+  </script>
+</body>
+</html>
