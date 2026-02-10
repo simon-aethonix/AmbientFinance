@@ -71,7 +71,6 @@
       justify-content: center;
       color: var(--af-slate-400);
       font-size: 14px;
-      border-style: dashed;
     }
     .af-placeholder-half {
       grid-column: span 2;
@@ -116,8 +115,115 @@
             <div class="value">24%</div>
             <div class="change">↑ On track for goal</div>
           </div>
-          <div class="af-placeholder-card af-placeholder-wide">
-            <span>📊 Spending breakdown chart will render here</span>
+          <div class="af-placeholder-card af-placeholder-wide" style="flex-direction:column;align-items:stretch;padding:28px 32px;">
+            <div class="label" style="margin-bottom:20px;">Spending Breakdown</div>
+            <!-- Donut chart + legend side by side -->
+            <div style="display:flex;gap:40px;align-items:center;flex-wrap:wrap;flex:1;">
+              <!-- Donut Chart (SVG) -->
+              <div style="flex-shrink:0;position:relative;width:200px;height:200px;">
+                <svg viewBox="0 0 42 42" style="width:100%;height:100%;transform:rotate(-90deg);">
+                  <!-- Housing 35% -->
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="#145247" stroke-width="4.5"
+                    stroke-dasharray="35 65" stroke-dashoffset="0" />
+                  <!-- Groceries 18% -->
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="#22876f" stroke-width="4.5"
+                    stroke-dasharray="18 82" stroke-dashoffset="-35" />
+                  <!-- Transport 12% -->
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="#4ec4a6" stroke-width="4.5"
+                    stroke-dasharray="12 88" stroke-dashoffset="-53" />
+                  <!-- Dining 10% -->
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="#d49a40" stroke-width="4.5"
+                    stroke-dasharray="10 90" stroke-dashoffset="-65" />
+                  <!-- Subscriptions 8% -->
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="#4078d4" stroke-width="4.5"
+                    stroke-dasharray="8 92" stroke-dashoffset="-75" />
+                  <!-- Other 17% -->
+                  <circle cx="21" cy="21" r="15.915" fill="none" stroke="#c8cad1" stroke-width="4.5"
+                    stroke-dasharray="17 83" stroke-dashoffset="-83" />
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <span style="font-family:var(--af-font-display);font-size:22px;font-weight:500;color:var(--af-slate-900);letter-spacing:-0.02em;">£2,847</span>
+                  <span style="font-size:11px;color:var(--af-slate-400);margin-top:2px;">This month</span>
+                </div>
+              </div>
+              <!-- Legend + Bar breakdown -->
+              <div style="flex:1;min-width:240px;">
+                <div style="display:flex;flex-direction:column;gap:14px;">
+                  <!-- Housing -->
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:13px;font-weight:500;color:var(--af-slate-700);display:flex;align-items:center;gap:8px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#145247;display:inline-block;"></span>Housing
+                      </span>
+                      <span style="font-size:13px;font-weight:600;color:var(--af-slate-800);">£997 <span style="font-weight:400;color:var(--af-slate-400);">35%</span></span>
+                    </div>
+                    <div style="height:6px;border-radius:3px;background:var(--af-sand-100);overflow:hidden;">
+                      <div style="width:35%;height:100%;border-radius:3px;background:#145247;"></div>
+                    </div>
+                  </div>
+                  <!-- Groceries -->
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:13px;font-weight:500;color:var(--af-slate-700);display:flex;align-items:center;gap:8px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#22876f;display:inline-block;"></span>Groceries
+                      </span>
+                      <span style="font-size:13px;font-weight:600;color:var(--af-slate-800);">£512 <span style="font-weight:400;color:var(--af-slate-400);">18%</span></span>
+                    </div>
+                    <div style="height:6px;border-radius:3px;background:var(--af-sand-100);overflow:hidden;">
+                      <div style="width:18%;height:100%;border-radius:3px;background:#22876f;"></div>
+                    </div>
+                  </div>
+                  <!-- Transport -->
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:13px;font-weight:500;color:var(--af-slate-700);display:flex;align-items:center;gap:8px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#4ec4a6;display:inline-block;"></span>Transport
+                      </span>
+                      <span style="font-size:13px;font-weight:600;color:var(--af-slate-800);">£342 <span style="font-weight:400;color:var(--af-slate-400);">12%</span></span>
+                    </div>
+                    <div style="height:6px;border-radius:3px;background:var(--af-sand-100);overflow:hidden;">
+                      <div style="width:12%;height:100%;border-radius:3px;background:#4ec4a6;"></div>
+                    </div>
+                  </div>
+                  <!-- Dining -->
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:13px;font-weight:500;color:var(--af-slate-700);display:flex;align-items:center;gap:8px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#d49a40;display:inline-block;"></span>Dining Out
+                      </span>
+                      <span style="font-size:13px;font-weight:600;color:var(--af-slate-800);">£285 <span style="font-weight:400;color:var(--af-slate-400);">10%</span></span>
+                    </div>
+                    <div style="height:6px;border-radius:3px;background:var(--af-sand-100);overflow:hidden;">
+                      <div style="width:10%;height:100%;border-radius:3px;background:#d49a40;"></div>
+                    </div>
+                  </div>
+                  <!-- Subscriptions -->
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:13px;font-weight:500;color:var(--af-slate-700);display:flex;align-items:center;gap:8px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#4078d4;display:inline-block;"></span>Subscriptions
+                      </span>
+                      <span style="font-size:13px;font-weight:600;color:var(--af-slate-800);">£228 <span style="font-weight:400;color:var(--af-slate-400);">8%</span></span>
+                    </div>
+                    <div style="height:6px;border-radius:3px;background:var(--af-sand-100);overflow:hidden;">
+                      <div style="width:8%;height:100%;border-radius:3px;background:#4078d4;"></div>
+                    </div>
+                  </div>
+                  <!-- Other -->
+                  <div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                      <span style="font-size:13px;font-weight:500;color:var(--af-slate-700);display:flex;align-items:center;gap:8px;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#c8cad1;display:inline-block;"></span>Other
+                      </span>
+                      <span style="font-size:13px;font-weight:600;color:var(--af-slate-800);">£483 <span style="font-weight:400;color:var(--af-slate-400);">17%</span></span>
+                    </div>
+                    <div style="height:6px;border-radius:3px;background:var(--af-sand-100);overflow:hidden;">
+                      <div style="width:17%;height:100%;border-radius:3px;background:#c8cad1;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="af-placeholder-card af-placeholder-half">
             <div class="label">Recent Transactions</div>
