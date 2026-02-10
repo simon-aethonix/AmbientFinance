@@ -409,9 +409,26 @@
       .af-pen-summary { grid-template-columns: 1fr; }
       .af-acc-header { flex-direction: column; align-items: flex-start; gap: 8px; }
       .af-acc-right { width: 100%; justify-content: space-between; }
-      .af-tabs { overflow-x: auto; }
-      .af-tab { white-space: nowrap; padding: 12px 16px; }
+      .af-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 0;
+        margin-left: -24px;
+        margin-right: -24px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+      .af-tabs::-webkit-scrollbar { display: none; }
+      .af-tab { white-space: nowrap; padding: 12px 16px; font-size: 13px; flex-shrink: 0; }
       .af-strategy-btns { flex-direction: column; }
+      .af-proj-body { padding: 20px 20px 24px; }
+      .af-proj-header { padding: 20px 20px 0; }
+      .af-state-pension { padding: 24px; }
+      .af-milestones { padding: 24px; }
+      .af-allowance { padding: 24px; }
+      .af-slider-value { font-size: 22px; }
     }
   </style>
 </head>
