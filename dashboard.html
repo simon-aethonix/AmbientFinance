@@ -77,6 +77,7 @@
     }
     @media (max-width: 600px) {
       .af-placeholder-grid { grid-template-columns: 1fr; }
+      .af-rec-grid-resp { grid-template-columns: 1fr !important; }
     }
   </style>
 </head>
@@ -219,6 +220,54 @@
               </div>
             </div>
           </div>
+          <!-- Portfolio overview row -->
+          <div class="af-placeholder-card">
+            <div class="label">Investments</div>
+            <div class="value">£38,200</div>
+            <div class="change">↑ +£1,420 (3.9%) YTD</div>
+            <a href="investments.html" style="display:inline-block;margin-top:12px;font-size:12px;font-weight:600;color:var(--af-green-600);text-decoration:none;">View portfolio →</a>
+          </div>
+          <div class="af-placeholder-card">
+            <div class="label">Shares</div>
+            <div class="value">£8,742</div>
+            <div class="change" style="color: var(--af-red);">↓ -£486 (-5.3%) today</div>
+            <a href="shares.html" style="display:inline-block;margin-top:12px;font-size:12px;font-weight:600;color:var(--af-green-600);text-decoration:none;">View shares →</a>
+          </div>
+          <div class="af-placeholder-card">
+            <div class="label">Pensions</div>
+            <div class="value">£287,450</div>
+            <div class="change">↑ +£14,820 (5.4%) this year</div>
+            <a href="pensions.html" style="display:inline-block;margin-top:12px;font-size:12px;font-weight:600;color:var(--af-green-600);text-decoration:none;">View pensions →</a>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="af-placeholder-card" style="grid-column:1/-1;padding:24px 32px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div class="label" style="margin-bottom:0;">Top Recommendations</div>
+              <a href="recommendations.html" style="font-size:12px;font-weight:600;color:var(--af-green-600);text-decoration:none;">View all →</a>
+            </div>
+            <div class="af-rec-grid-resp" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:var(--af-sand-50);border-radius:var(--af-radius-md);">
+                <div style="width:44px;height:44px;border-radius:var(--af-radius-md);background:var(--af-green-100);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💡</div>
+                <div>
+                  <span style="display:inline-flex;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--af-green-100);color:var(--af-green-800);margin-bottom:6px;">High Impact</span>
+                  <div style="font-family:var(--af-font-display);font-size:16px;font-weight:500;color:var(--af-slate-900);margin-bottom:6px;">Max out your ISA before April</div>
+                  <div style="font-size:13px;color:var(--af-slate-500);line-height:1.5;">£12,400 of your 2024/25 ISA allowance remaining. Use it before 5 April.</div>
+                  <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--af-green-700);display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--af-green-50);border-radius:4px;">⚡ Potential tax saving: £620/yr</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:var(--af-sand-50);border-radius:var(--af-radius-md);">
+                <div style="width:44px;height:44px;border-radius:var(--af-radius-md);background:#fef3e2;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💳</div>
+                <div>
+                  <span style="display:inline-flex;padding:2px 8px;border-radius:50px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--af-green-100);color:var(--af-green-800);margin-bottom:6px;">High Impact</span>
+                  <div style="font-family:var(--af-font-display);font-size:16px;font-weight:500;color:var(--af-slate-900);margin-bottom:6px;">Clear your credit card balance</div>
+                  <div style="font-size:13px;color:var(--af-slate-500);line-height:1.5;">Your Amex has a £1,247.60 balance costing ~£18/month in interest.</div>
+                  <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--af-green-700);display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--af-green-50);border-radius:4px;">⚡ Save £216/yr in interest</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="af-placeholder-card" style="grid-column:1/-1;">
             <div class="label" style="margin-bottom:16px;">Recent Transactions</div>
             <div style="display:flex;flex-direction:column;">
